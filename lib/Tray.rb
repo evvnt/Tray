@@ -1,5 +1,6 @@
 require "Tray/version"
+require 'virtus'
+require "Tray/model"
 
 module Tray
-  # Your code goes here...
 end
