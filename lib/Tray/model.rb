@@ -29,6 +29,11 @@ module Tray
       @shipping_address ||= ShippingAddress.find(shipping_address_id)
     end
 
+    def payment_method
+      return unless payment_method_id
+      @payment_method ||= PaymentMethod.find(payment_method_id)
+    end
+
 
   end
 end

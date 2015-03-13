@@ -6,6 +6,7 @@ module Tray
       attribute :product_model, Symbol
       attribute :product_id, Integer
       attribute :quantity, Integer, default: 0
+      attribute :options, Hash, default: {}
 
       def entity
         @entity ||= Cart::PRODUCT_KEYS.invert[product_model].find(product_id)
