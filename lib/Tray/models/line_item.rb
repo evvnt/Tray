@@ -11,6 +11,10 @@ module Tray
       def entity
         @entity ||= Cart::PRODUCT_KEYS.invert[product_model].find(product_id)
       end
+
+      def options
+        (super || {}).with_indifferent_access
+      end
     end
   end
 end

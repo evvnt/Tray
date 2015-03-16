@@ -6,14 +6,15 @@ module Tray
     end
 
     def total_in_cents
-      total = event_subtotal_with_discounts_in_cents
-      total = total + membership_subtotal_in_cents
-      total = total + donation_subtotal_in_cents
-      return total
+      [
+        :event_subtotal_with_discounts_in_cents, 
+        :membership_subtotal_in_cents, 
+        :donation_subtotal_in_cents
+      ].map {|meth| method(meth).call}.sum
     end
 
     def subtotal
-      subtotal_in_cents.to_f / 100.0
+      total_in_cents.to_f / 100.0
     end
 
     def total
@@ -33,13 +34,14 @@ module Tray
 
     def membership_subtotal_in_cents
       line_items.by_membership.reduce(0) do |memo, item|
-        memo += item.entity.price_in_cents
+        memo += item.entity.price_in_cents.to_i
       end
     end
 
     def donation_subtotal_in_cents
-      line_items.by_membership.reduce(0) do |memo, item|
-        memo += item.options.symbolize_keys[:amount_in_cents]
+      line_items.by_donation.reduce(0) do |memo, item|
+        options = item.options.symbolize_keys
+        memo += (options[:amount_in_cents] || 0).to_i
       end
     end
 
