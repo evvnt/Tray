@@ -25,6 +25,12 @@ module Tray
       line_items.count
     end
 
+    def ticket_fees_in_cents
+      line_items.by_ticket.reduce(0) do |memo, item|
+        memo += item.entity.fee_in_cents * (item.quantity || 1)
+      end
+    end
+
     # private
     def event_subtotal_in_cents
       line_items.by_ticket.reduce(0) do |memo, item|
