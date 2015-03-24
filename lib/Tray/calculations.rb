@@ -21,20 +21,26 @@ module Tray
       total_in_cents.to_f / 100.0
     end
 
+    def fees
+      ticket_fees_in_cents.to_f / 100.0
+    end
+
     def item_count
       line_items.count
     end
 
     def ticket_fees_in_cents
       line_items.by_ticket.reduce(0) do |memo, item|
-        memo += item.entity.fee_in_cents * (item.quantity || 1)
+        ticket_price = item.entity.fee_for_level_in_cents(item.options[:price_level])
+        memo += ticket_price * (item.quantity || 1)
       end
     end
 
     # private
     def event_subtotal_in_cents
       line_items.by_ticket.reduce(0) do |memo, item|
-        memo += item.entity.price_in_cents * item.quantity
+        ticket_price = item.entity.price_for_level_in_cents(item.options[:price_level])
+        memo += ticket_price * item.quantity
       end
     end
 
@@ -53,6 +59,7 @@ module Tray
 
     def event_subtotal_with_discounts_in_cents
       subtotal = event_subtotal_in_cents
+      subtotal += ticket_fees_in_cents
       promo_codes.sorted.each do |code|
         next unless code.discount_code
         subtotal = code.apply_to_total(subtotal)
