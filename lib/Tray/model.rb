@@ -23,6 +23,7 @@ module Tray
     attribute :updated_at, DateTime, default: -> _, attribute {Time.now}
     attribute :payment_method_id, Integer
     attribute :shipping_address_id, Integer
+    attribute :customer_id, Integer
 
     def shipping_address
       return unless shipping_address_id
@@ -32,6 +33,11 @@ module Tray
     def payment_method
       return unless payment_method_id
       @payment_method ||= PaymentMethod.find(payment_method_id)
+    end
+
+    def customer
+      return unless customer_id
+      @customer ||= Customer.find(customer_id)
     end
 
 

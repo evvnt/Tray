@@ -17,6 +17,10 @@ module Tray
         by_ticket.group_by {|li| li.entity.event}
       end
 
+      def by_organization
+        by_ticket.group_by {|li| li.entity.event.organization_id}
+      end
+
       def by_membership
         select {|li| li.product_model == :membership}
       end
