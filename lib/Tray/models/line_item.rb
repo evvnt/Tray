@@ -3,6 +3,7 @@ module Tray
     class LineItem
       include Virtus.model
 
+      attribute :id, Integer, default: -> _, attribute {UUID.generate}
       attribute :product_model, Symbol
       attribute :product_id, Integer
       attribute :quantity, Integer, default: 0
