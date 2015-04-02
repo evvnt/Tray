@@ -9,7 +9,7 @@ module Tray
         @discount_code ||= Cart::PRODUCT_KEYS.invert[:discount].find(discount_code_id)
       end
 
-      def apply_to_event_total(event_id, total)
+      def apply_to_total(event_id, total)
         return total if discount_code.event_ids.length > 0 && !discount_code.event_ids.include?(event_id)
         return total if discount_code.event_ids.length == 0
         ##TODO: FINISH THIS /\

@@ -63,27 +63,13 @@ module Tray
     end
 
     def event_subtotal_with_discounts_in_cents
-      total = 0
-      total_by_org = line_items.by_organization.each do |org_id, tickets|
-        organization_total = 0
-        tickets.group_by {|i| i.entity.event_id }.reduce do |event_id, event_tickets|
-          event_total = event_tickets.reduce(0) do |memo, item|
-            ticket_price   = item.entity.price_for_level_in_cents(item.options[:price_level])
-            total = ticket_price * item.quantity
-          end
-          
-          #Promo Codes
-          promo_codes.sorted.each do |code|
-            next unless code.discount_code
-            event_total = code.apply_to_total(event_id, event_total)
-          end
-
-          organization_total += event_total
-        end#End Event
-        total += organization_total
-      end#End Organization
-
-      return total
+      subtotal = event_subtotal_in_cents
+      subtotal += ticket_fees_in_cents
+      promo_codes.sorted.each do |code|
+        next unless code.discount_code
+        subtotal = code.apply_to_total(subtotal)
+      end
+      subtotal
     end
   end
 end
