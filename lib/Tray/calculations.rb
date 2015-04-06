@@ -36,9 +36,12 @@ module Tray
 
     def ticket_fees_in_cents
       line_items.by_ticket.reduce(0) do |memo, item|
-        next 0 unless item.entity.event.pass_fees_to_customer?
-        ticket_price = item.entity.fee_for_level_in_cents(item.options[:price_level])
-        memo += ticket_price * (item.quantity || 1)
+        if !item.entity.event.pass_fees_to_customer?
+          memo += 0
+        else
+          ticket_price = item.entity.fee_for_level_in_cents(item.options[:price_level])
+          memo += ticket_price * (item.quantity || 1)
+        end
       end
     end
 
