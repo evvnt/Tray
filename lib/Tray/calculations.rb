@@ -8,13 +8,14 @@ module Tray
     def total_in_cents
       [
         :event_subtotal_with_discounts_in_cents, 
+        :ticket_fees_in_cents,
         :membership_subtotal_in_cents, 
         :donation_subtotal_in_cents
       ].map {|meth| method(meth).call}.sum
     end
 
     def subtotal
-      total_in_cents.to_f / 100.0
+      subtotal_in_cents.to_f / 100.0
     end
 
     def total
@@ -36,6 +37,7 @@ module Tray
 
     def ticket_fees_in_cents
       line_items.by_ticket.reduce(0) do |memo, item|
+        next 0 unless item.entity.event.pass_fees_to_customer?
         ticket_price = item.entity.fee_for_level_in_cents(item.options[:price_level])
         memo += ticket_price * (item.quantity || 1)
       end
@@ -63,13 +65,7 @@ module Tray
     end
 
     def event_subtotal_with_discounts_in_cents
-      subtotal = event_subtotal_in_cents
-      subtotal += ticket_fees_in_cents
-      promo_codes.sorted.each do |code|
-        next unless code.discount_code
-        subtotal = code.apply_to_total(subtotal)
-      end
-      subtotal
+      Tray::Calculator::Runner.new(self).call || 0
     end
   end
 end

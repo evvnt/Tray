@@ -5,6 +5,8 @@ require_relative 'models/line_item'
 require_relative 'models/line_item_collection'
 require_relative 'models/promo_code'
 require_relative 'models/promo_code_collection'
+require_relative 'calculator/runner'
+
 
 module Tray
   class Model
