@@ -7,8 +7,7 @@ module Tray
 
     def total_in_cents
       [
-        :event_subtotal_with_discounts_in_cents, 
-        :ticket_fees_in_cents,
+        :event_subtotal_with_discounts_in_cents,
         :membership_subtotal_in_cents, 
         :donation_subtotal_in_cents
       ].map {|meth| method(meth).call}.sum
