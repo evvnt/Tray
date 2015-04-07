@@ -18,6 +18,10 @@ module Tray
         [ttl_less_percent, 0.0].max
       end
 
+      def delivery_method
+        line_items.first.options[:delivery_method]
+      end
+
       def credit_discount
         promo_code_credit_total + customer_credits_total
       end
