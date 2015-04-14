@@ -8,6 +8,7 @@ module Tray
       attribute :product_id, Integer
       attribute :quantity, Integer, default: 0
       attribute :options, Hash, default: {}
+      attribute :created_at, DateTime, default: -> _, attribute {Time.now}
 
       def entity
         @entity ||= Cart::PRODUCT_KEYS.invert[product_model].find(product_id)

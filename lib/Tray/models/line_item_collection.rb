@@ -9,6 +9,14 @@ module Tray
         super(LineItem.new(line_item))
       end
 
+      def find(id = nil)
+        if block_given?
+          super
+        else
+          super {|li| li.id == id}
+        end
+      end
+
       def by_ticket
         select {|li| li.product_model == :ticket}
       end
