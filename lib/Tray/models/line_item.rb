@@ -17,6 +17,11 @@ module Tray
       def options
         (super || {}).with_indifferent_access
       end
+
+      def delivery_fee
+        return 0 unless options[:delivery_method].to_s == "mail"
+        entity.event.mailing_fee_in_cents
+      end
     end
   end
 end

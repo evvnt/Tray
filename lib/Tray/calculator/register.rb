@@ -11,7 +11,8 @@ module Tray
       attribute :applied_subscriptions, Array[Hash], default: []
 
       def discounted_total
-        ttl_less_credits = line_items_total - credit_discount
+        ttl_with_delivery_fee = line_items_total + delivery_fee_in_cents
+        ttl_less_credits = ttl_with_delivery_fee - credit_discount
         ttl_less_percent = ttl_less_credits - (ttl_less_credits * ([percent_discount, 0].max.to_f * 0.01))
         
         #Totals Can't Go Negative
@@ -20,6 +21,10 @@ module Tray
 
       def delivery_method
         line_items.first.options[:delivery_method]
+      end
+
+      def delivery_fee_in_cents
+        line_items.first.delivery_fee
       end
 
       def credit_discount

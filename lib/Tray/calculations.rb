@@ -22,7 +22,7 @@ module Tray
     end
 
     def fees
-      ticket_fees_in_cents.to_f / 100.0
+      (ticket_fees_in_cents.to_f / 100.0) + (delivery_fees_in_cents.to_f / 100.0)
     end
 
     def credits_available_in_cents
@@ -42,6 +42,12 @@ module Tray
           ticket_price = item.entity.fee_for_level_in_cents(item.options[:price_level])
           memo += ticket_price * (item.quantity || 1)
         end
+      end
+    end
+
+    def delivery_fees_in_cents
+      line_items.by_event.values.reduce(0) do |memo, items|
+        memo += items.first.delivery_fee
       end
     end
 
