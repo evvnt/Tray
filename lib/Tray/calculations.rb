@@ -2,6 +2,8 @@ module Tray
   module Calculations
     def subtotal_in_cents
       subtotal = event_subtotal_in_cents
+      subtotal += membership_subtotal_in_cents
+      subtotal += donation_subtotal_in_cents
       subtotal
     end
 
