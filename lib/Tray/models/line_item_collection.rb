@@ -37,6 +37,10 @@ module Tray
         select {|li| li.product_model == :donation}
       end
 
+      def by_ticket_package
+        select {|li| li.product_model == :ticket_package}
+      end
+
       def quantity
         map(&:quantity).reduce(:+)
       end
