@@ -4,6 +4,7 @@ module Tray
       subtotal = event_subtotal_in_cents
       subtotal += membership_subtotal_in_cents
       subtotal += donation_subtotal_in_cents
+      subtotal += ticket_packages_in_cents
       subtotal
     end
 
@@ -11,7 +12,9 @@ module Tray
       [
         :event_subtotal_with_discounts_in_cents,
         :membership_subtotal_in_cents, 
-        :donation_subtotal_in_cents
+        :donation_subtotal_in_cents,
+        :ticket_packages_in_cents,
+        :ticket_packages_fees_in_cents
       ].map {|meth| method(meth).call}.sum
     end
 
@@ -33,7 +36,7 @@ module Tray
     end
 
     def item_count
-      line_items.count
+      line_items.select(&:valid?).count
     end
 
     def ticket_fees_in_cents
@@ -48,9 +51,13 @@ module Tray
     end
 
     def delivery_fees_in_cents
-      line_items.by_event.values.reduce(0) do |memo, items|
+      event_fees = line_items.by_event.values.reduce(0) do |memo, items|
         memo += items.first.delivery_fee
       end
+
+      package_fees = ticket_packages_fees_in_cents
+
+      event_fees + package_fees
     end
 
     # private
@@ -71,6 +78,19 @@ module Tray
       line_items.by_donation.reduce(0) do |memo, item|
         options = item.options.symbolize_keys
         memo += (options[:amount_in_cents] || 0).to_i
+      end
+    end
+
+    def ticket_packages_in_cents
+      line_items.by_ticket_package.reduce(0) do |memo, item|
+        memo += (item.entity.price_in_cents || 0).to_i
+      end
+    end
+
+    def ticket_packages_fees_in_cents
+      line_items.by_ticket_package.reduce(0) do |memo, item|
+        next memo unless item.options[:delivery_method].to_s == "mail"
+        memo += item.entity.mailing_fee_in_cents
       end
     end
 

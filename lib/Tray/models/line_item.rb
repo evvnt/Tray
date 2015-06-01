@@ -22,6 +22,11 @@ module Tray
         return 0 unless options[:delivery_method].to_s == "mail"
         entity.event.mailing_fee_in_cents
       end
+
+      def valid?
+        return true unless product_model == :ticket_package
+        return true if options[:finished]
+      end
     end
   end
 end

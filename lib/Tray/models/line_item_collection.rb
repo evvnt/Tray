@@ -38,7 +38,7 @@ module Tray
       end
 
       def by_ticket_package
-        select {|li| li.product_model == :ticket_package}
+        select {|li| li.product_model == :ticket_package && li.valid?}
       end
 
       def quantity
