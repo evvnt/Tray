@@ -60,6 +60,14 @@ module Tray
       event_fees + package_fees
     end
 
+    def membership_discount_total
+      runner = Tray::Calculator::Runner.new(self)
+      fixed_total = runner.registers.map(&:membership_fixed_total).reduce(:+) || 0
+      discount_total = runner.registers.map(&:membership_discount_total).reduce(:+) || 0
+
+      fixed_total + discount_total
+    end
+
     # private
     def event_subtotal_in_cents
       line_items.by_ticket.reduce(0) do |memo, item|

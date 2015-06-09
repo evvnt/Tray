@@ -28,7 +28,7 @@ module Tray
       end
 
       def credit_discount
-        promo_code_credit_total + customer_credits_total
+        promo_code_credit_total + customer_credits_total + membership_fixed_total
       end
 
       def customer_credits_total
@@ -39,9 +39,17 @@ module Tray
         applied_codes.select {|h| h[:type] == :credit}.map {|h| h[:amount] }.flatten.reduce(:+).to_i
       end
 
+      def membership_fixed_total
+        applied_subscriptions.select {|h| h[:type] == :fixed}.map {|h| h[:amount] }.flatten.reduce(:+).to_i
+      end
+
+      def membership_discount_total
+        applied_subscriptions.select {|h| h[:type] == :percentage}.map {|h| h[:amount] }.flatten.reduce(:+).to_i
+      end
+
       def percent_discount
         codes_off = applied_codes.select {|h| h[:type] == :percentage}.map {|h| h[:amount] }.flatten.reduce(:+).to_i
-        subscriptions_off = applied_subscriptions.select {|h| h[:type] == :percentage}.map {|h| h[:amount] }.flatten.reduce(:+).to_i
+        subscriptions_off = membership_discount_total
       
         codes_off + subscriptions_off
       end
