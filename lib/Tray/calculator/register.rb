@@ -19,6 +19,13 @@ module Tray
         [ttl_less_percent, 0.0].max
       end
 
+      def bare_ticket_cost
+        line_items.reduce(0) do |memo, item|
+          ticket_price = item.entity.price_for_level_in_cents(item.options[:price_level])
+          memo += ticket_price * (item.quantity || 1)
+        end
+      end
+
       def delivery_method
         line_items.first.options[:delivery_method]
       end
