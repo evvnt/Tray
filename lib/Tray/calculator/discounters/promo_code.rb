@@ -25,7 +25,7 @@ module Tray
             code_amount = code.discount_code.amount.to_f * 100.0
             
             registers.each do |reg|
-              discount    = ([code_amount, 0].max - reg.line_items_total).abs
+              discount    = reg.line_items_total - [code_amount, 0].max
               discount    = reg.line_items_total - discount
               code_amount = code_amount - discount
               reg.applied_codes.push({code: code, amount: discount, type: :credit})
