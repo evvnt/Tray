@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Tray::VERSION
   spec.authors       = ["Christopher Ostrowski"]
   spec.email         = ["chris@madebyfunction.com"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = %q{An esoteric shopping cart for the mynorth tickets ecosystem.}
+  spec.description   = %q{An esoteric shopping cart for the mynorth tickets ecosystem. Makes heavy use of virtus to serializer/deserialize from Redis.}
   spec.homepage      = ""
   spec.license       = "MIT"
 
