@@ -14,7 +14,8 @@ module Tray
         :membership_subtotal_in_cents, 
         :donation_subtotal_in_cents,
         :ticket_packages_in_cents,
-        :ticket_packages_fees_in_cents
+        :ticket_packages_mail_fees_in_cents,
+        :ticket_package_fees_in_cents
       ].map {|meth| method(meth).call}.sum
     end
 
@@ -27,7 +28,7 @@ module Tray
     end
 
     def fees
-      (ticket_fees_in_cents.to_f / 100.0) + (delivery_fees_in_cents.to_f / 100.0)
+      (ticket_fees_in_cents.to_f / 100.0) + (delivery_fees_in_cents.to_f / 100.0) + (ticket_package_fees_in_cents.to_f / 100.0)
     end
 
     def credits_available_in_cents
@@ -55,9 +56,11 @@ module Tray
         memo += items.first.delivery_fee
       end
 
-      package_fees = ticket_packages_fees_in_cents
+      event_fees + ticket_packages_mail_fees_in_cents
+    end
 
-      event_fees + package_fees
+    def ticket_package_fees_in_cents
+      line_items.by_ticket_package.reduce(0) {|memo, package| memo += package.entity.package_fee_in_cents}
     end
 
     def membership_discount_total
@@ -95,7 +98,7 @@ module Tray
       end
     end
 
-    def ticket_packages_fees_in_cents
+    def ticket_packages_mail_fees_in_cents
       line_items.by_ticket_package.reduce(0) do |memo, item|
         next memo unless item.options[:delivery_method].to_s == "mail"
         memo += item.entity.mailing_fee_in_cents
