@@ -99,6 +99,7 @@ module Tray
     end
 
     def ticket_packages_mail_fees_in_cents
+      return 0 #TODO: Mailing fees do not apply ticket packages.
       line_items.by_ticket_package.reduce(0) do |memo, item|
         next memo unless item.options[:delivery_method].to_s == "mail"
         memo += item.entity.mailing_fee_in_cents
