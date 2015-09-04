@@ -28,7 +28,6 @@ module Tray
 
         def apply_discount_subscription_registers(subscription, registers)
           amount = subscription.membership.amount.to_f * 100.0
-          #Rails.logger.warn("Applied subscription amount: #{amount}")
           registers.each {|reg| reg.applied_subscriptions.push({subscription: subscription, amount: amount, type: :percentage})}
         end
 
