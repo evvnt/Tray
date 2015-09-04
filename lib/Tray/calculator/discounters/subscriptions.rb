@@ -22,12 +22,13 @@ module Tray
 
         def applicable_registers(subscription)
           @registers.select do |register|
-            next true if subscription.organization_id == register.event.organization_id
+            next true if subscription.organization_id == register.event.organization_id && register.event.memberships_apply?
           end
         end
 
         def apply_discount_subscription_registers(subscription, registers)
           amount = subscription.membership.amount.to_f * 100.0
+          #Rails.logger.warn("Applied subscription amount: #{amount}")
           registers.each {|reg| reg.applied_subscriptions.push({subscription: subscription, amount: amount, type: :percentage})}
         end
 
