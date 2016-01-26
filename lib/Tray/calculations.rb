@@ -11,7 +11,7 @@ module Tray
     def total_in_cents
       [
         :event_subtotal_with_discounts_in_cents,
-        :membership_subtotal_in_cents, 
+        :membership_subtotal_in_cents,
         :donation_subtotal_in_cents,
         :ticket_packages_in_cents,
         :ticket_packages_mail_fees_in_cents,
@@ -42,7 +42,7 @@ module Tray
 
     def ticket_fees_in_cents
       line_items.by_ticket.reduce(0) do |memo, item|
-        if !item.entity.event.pass_fees_to_customer?
+        if !item.entity.event.show_fees_to_customer?
           memo += 0
         else
           ticket_price = item.entity.fee_for_level_in_cents(item.options[:price_level])
