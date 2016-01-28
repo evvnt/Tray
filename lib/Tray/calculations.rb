@@ -19,12 +19,30 @@ module Tray
       ].map {|meth| method(meth).call}.sum
     end
 
+    # For displaying total to customer in port - handles hidden/visible fees
+    def customer_total_in_cents
+      [
+        :event_subtotal_in_cents,
+        :customer_ticket_fees_in_cents,
+        :membership_subtotal_in_cents,
+        :donation_subtotal_in_cents,
+        :ticket_packages_in_cents,
+        :ticket_packages_mail_fees_in_cents,
+        :ticket_package_fees_in_cents
+      ].map {|meth| method(meth).call}.sum
+    end
+
     def subtotal
       subtotal_in_cents.to_f / 100.0
     end
 
     def total
       total_in_cents.to_f / 100.0
+    end
+
+    # For displaying total to customer in port - handles hidden/visible fees
+    def customer_total
+      customer_total_in_cents.to_f / 100.0
     end
 
     def fees
@@ -40,7 +58,16 @@ module Tray
       line_items.select(&:valid?).count
     end
 
+    # For creating the order - return actual ticket fees
     def ticket_fees_in_cents
+      line_items.by_ticket.reduce(0) do |memo, item|
+        ticket_price = item.entity.fee_for_level_in_cents(item.options[:price_level])
+        memo += ticket_price * (item.quantity || 1)
+      end
+    end
+
+    # For displaying the order - return ticket fees only event is set to show them
+    def customer_ticket_fees_in_cents
       line_items.by_ticket.reduce(0) do |memo, item|
         if !item.entity.event.show_fees_to_customer?
           memo += 0
