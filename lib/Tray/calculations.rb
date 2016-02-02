@@ -4,7 +4,7 @@ module Tray
       subtotal = event_subtotal_in_cents
       subtotal += membership_subtotal_in_cents
       subtotal += donation_subtotal_in_cents
-      subtotal += ticket_packages_in_cents
+      subtotal += ticket_packages_subtotal_in_cents
       subtotal
     end
 
@@ -69,11 +69,11 @@ module Tray
     # For displaying the order - return ticket fees only event is set to show them
     def customer_ticket_fees_in_cents
       line_items.by_ticket.reduce(0) do |memo, item|
-        if !item.entity.event.show_fees_to_customer?
-          memo += 0
-        else
+        if item.entity.event.show_fees_to_customer?
           ticket_price = item.entity.fee_for_level_in_cents(item.options[:price_level])
           memo += ticket_price * (item.quantity || 1)
+        else
+          memo += 0
         end
       end
     end
@@ -84,6 +84,16 @@ module Tray
       end
 
       event_fees + ticket_packages_mail_fees_in_cents
+    end
+
+    def customer_ticket_package_fees_in_cents
+      line_items.by_ticket_package.reduce(0) do |memo, package|
+        if package.entity.show_fees_to_customer?
+          memo += package.entity.package_fee_in_cents
+        else
+          memo += 0
+        end
+      end
     end
 
     def ticket_package_fees_in_cents
@@ -118,6 +128,12 @@ module Tray
       line_items.by_donation.reduce(0) do |memo, item|
         options = item.options.symbolize_keys
         memo += (options[:amount_in_cents] || 0).to_i
+      end
+    end
+
+    def ticket_packages_subtotal_in_cents
+      line_items.by_ticket_package.reduce(0) do |memo, item|
+        memo += (item.entity.customer_price_in_cents || 0).to_i
       end
     end
 
