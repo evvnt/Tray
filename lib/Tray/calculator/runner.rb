@@ -15,7 +15,7 @@ module Tray
 
       def call
         @registers = add
-        
+
         discount(@registers)
         total
       end

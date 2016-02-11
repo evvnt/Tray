@@ -19,30 +19,12 @@ module Tray
       ].map {|meth| method(meth).call}.sum
     end
 
-    # For displaying total to customer in port - handles hidden/visible fees
-    def customer_total_in_cents
-      [
-        :event_subtotal_in_cents,
-        :customer_ticket_fees_in_cents,
-        :membership_subtotal_in_cents,
-        :donation_subtotal_in_cents,
-        :ticket_packages_in_cents,
-        :ticket_packages_mail_fees_in_cents,
-        :ticket_package_fees_in_cents
-      ].map {|meth| method(meth).call}.sum
-    end
-
     def subtotal
       subtotal_in_cents.to_f / 100.0
     end
 
     def total
       total_in_cents.to_f / 100.0
-    end
-
-    # For displaying total to customer in port - handles hidden/visible fees
-    def customer_total
-      customer_total_in_cents.to_f / 100.0
     end
 
     def fees
