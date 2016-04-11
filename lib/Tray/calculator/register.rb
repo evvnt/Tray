@@ -4,6 +4,7 @@ module Tray
       include Virtus.model
 
       attribute :event
+      attribute :package
       attribute :line_items, Tray::Models::LineItemCollection[Tray::Models::LineItem], default: []
       attribute :line_items_total, Integer, default: 0
       attribute :applied_codes, Array[Hash], default: []
@@ -14,7 +15,6 @@ module Tray
         ttl_with_delivery_fee = line_items_total + delivery_fee_in_cents
         ttl_less_credits = ttl_with_delivery_fee - credit_discount
         ttl_less_percent = ttl_less_credits - (ttl_less_credits * ([percent_discount, 0].max.to_f * 0.01))
-        
         #Totals Can't Go Negative
         [ttl_less_percent, 0.0].max
       end
@@ -57,7 +57,7 @@ module Tray
       def percent_discount
         codes_off = applied_codes.select {|h| h[:type] == :percentage}.map {|h| h[:amount] }.flatten.reduce(:+).to_i
         subscriptions_off = membership_discount_total
-      
+
         codes_off + subscriptions_off
       end
     end

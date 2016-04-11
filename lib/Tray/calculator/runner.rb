@@ -30,7 +30,8 @@ module Tray
 
       def adders
         [
-          Adders::Event
+          Adders::Event,
+          Adders::Package
         ]
       end
 

@@ -10,10 +10,9 @@ module Tray
 
     def total_in_cents
       [
-        :event_subtotal_with_discounts_in_cents,
+        :subtotal_with_discounts_in_cents,
         :membership_subtotal_in_cents,
         :donation_subtotal_in_cents,
-        :ticket_packages_in_cents,
         :ticket_packages_mail_fees_in_cents,
         :ticket_package_fees_in_cents
       ].map {|meth| method(meth).call}.sum
@@ -119,6 +118,8 @@ module Tray
       end
     end
 
+    # TODO: def ticket_package_with_discounts_in_cents
+
     def ticket_packages_in_cents
       line_items.by_ticket_package.reduce(0) do |memo, item|
         memo += (item.entity.price_in_cents || 0).to_i
@@ -133,9 +134,10 @@ module Tray
       end
     end
 
-    def event_subtotal_with_discounts_in_cents
+    def subtotal_with_discounts_in_cents
       Tray::Calculator::Runner.new(self).call || 0
     end
+
   end
 end
 
