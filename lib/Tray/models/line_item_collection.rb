@@ -45,7 +45,12 @@ module Tray
         map(&:quantity).reduce(:+)
       end
 
-      def decrement(model, id)
+      def decrement(model, id, seatId)
+
+        if seatId.present?
+          return delete(find {|item| item.product_model == model && item.product_id == id && item.options.seat_id == seatId })
+        end
+
         item = find {|item| item.product_model == model && item.product_id == id}
         if item.quantity > 1
           item.quantity = item.quantity - 1
@@ -53,6 +58,7 @@ module Tray
           delete(item)
         end
       end
+
     end
   end
 end
