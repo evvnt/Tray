@@ -13,8 +13,14 @@ module Tray
 
         def applicable_registers(code)
           @registers.select do |register|
-            next true if code.discount_code.event_ids.length > 0 && code.discount_code.event_ids.include?(register.event.id)
-            next true if code.discount_code.event_ids.length == 0 && code.discount_code.organization_id == register.event.organization_id
+            if register.event.present?
+              next true if code.discount_code.event_ids.length > 0 && code.discount_code.event_ids.include?(register.event.id)
+              next true if code.discount_code.event_ids.length == 0 && code.discount_code.organization_id == register.event.organization_id && code.discount_code.applies_to_all_events
+            end
+            if register.package.present?
+              next true if code.discount_code.ticket_package_ids.length > 0 && code.discount_code.ticket_package_ids.include?(register.package.product_id)
+            end
+            next false
           end
         end
 
@@ -23,7 +29,6 @@ module Tray
             registers.each {|reg| reg.applied_codes.push({code: code, amount: code.discount_code.amount, type: :percentage})}
           else
             code_amount = code.discount_code.amount.to_f * 100.0
-            
             registers.each do |reg|
               discount    = reg.line_items_total - [code_amount, 0].max
               discount    = reg.line_items_total - discount

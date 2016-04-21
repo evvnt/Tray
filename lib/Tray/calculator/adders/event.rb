@@ -3,7 +3,7 @@ module Tray
     module Adders
       class Event
         class << self
-          
+
           def call(cart)
             totals = []
             cart.line_items.by_event.each do |event, items|
@@ -15,10 +15,8 @@ module Tray
 
           def reduce_line_items(items)
             items.reduce(0) do |memo, item|
-              ticket_price = item.entity.price_for_level_in_cents(item.options[:price_level])
-              if item.entity.event.pass_fees_to_customer?
-                ticket_price += item.entity.fee_for_level_in_cents(item.options[:price_level])
-              end
+              ticket_price = item.entity.price_for_level_in_cents_without_fee(item.options[:price_level])
+              ticket_price += item.entity.fee_for_level_in_cents(item.options[:price_level])
               memo += ticket_price * (item.quantity || 1)
             end
           end

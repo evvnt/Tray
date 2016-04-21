@@ -15,7 +15,7 @@ module Tray
 
       def call
         @registers = add
-        
+
         discount(@registers)
         total
       end
@@ -30,7 +30,8 @@ module Tray
 
       def adders
         [
-          Adders::Event
+          Adders::Event,
+          Adders::Package
         ]
       end
 
