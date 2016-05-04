@@ -6,7 +6,9 @@ module Tray
     end
 
     def remove(product_model, product_id, options = {})
-      line_items.decrement(product_model, product_id)
+      Rails.logger.debug 'LineItemsRemove'
+      line_items.decrement(product_model, product_id, nil) unless options[:seatid].present?
+      line_items.decrement(product_model, product_id, options[:seatid])
     end
 
     def empty
