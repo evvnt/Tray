@@ -51,11 +51,12 @@ module Tray
           return delete(find {|item| item.product_model == model && item.product_id == id && item.options[:seat_id] == seatId })
         end
 
-        item = find {|item| item.product_model == model && item.product_id == id}
-        if item.quantity > 1
-          item.quantity = item.quantity - 1
-        else
-          delete(item)
+        if item = find {|item| item.product_model == model && item.product_id == id}
+          if item.quantity > 1
+            item.quantity = item.quantity - 1
+          else
+            delete(item)
+          end
         end
       end
 
