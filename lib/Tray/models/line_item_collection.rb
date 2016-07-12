@@ -41,6 +41,10 @@ module Tray
         select {|li| li.product_model == :ticket_package && li.valid?}
       end
 
+      def by_gift_card
+        select {|li| li.product_model == :gift_card && li.valid?}
+      end
+
       def quantity
         map(&:quantity).reduce(:+)
       end
