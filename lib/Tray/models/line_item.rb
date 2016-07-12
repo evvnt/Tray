@@ -19,7 +19,7 @@ module Tray
       end
 
       def delivery_fee
-        return 0 unless options[:delivery_method].to_s == "mail"
+        return 0 unless options[:delivery_method].to_s == "mail" && product_model == :ticket
         entity.event.mailing_fee_in_cents
       end
 
