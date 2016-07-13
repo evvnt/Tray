@@ -1,21 +1,27 @@
 module Tray
   module Calculations
+
     def subtotal_in_cents
-      subtotal = event_subtotal_in_cents
-      subtotal += membership_subtotal_in_cents
-      subtotal += donation_subtotal_in_cents
-      subtotal += ticket_packages_subtotal_in_cents
-      subtotal
+      [
+          :event_subtotal_in_cents,
+          :ticket_packages_subtotal_in_cents
+      ].concat(tag_ons_subtotal_method_array).map { |meth| method(meth).call }.sum
     end
 
     def total_in_cents
       [
-        :subtotal_with_discounts_in_cents,
-        :membership_subtotal_in_cents,
-        :donation_subtotal_in_cents,
-        :ticket_packages_mail_fees_in_cents,
-        :ticket_package_fees_in_cents
-      ].map {|meth| method(meth).call}.sum
+          :subtotal_with_discounts_in_cents,
+          :ticket_packages_mail_fees_in_cents,
+          :ticket_package_fees_in_cents
+      ].concat(tag_ons_subtotal_method_array).map { |meth| method(meth).call }.sum
+    end
+
+    def tag_ons_subtotal_method_array
+      [
+          :membership_subtotal_in_cents,
+          :donation_subtotal_in_cents,
+          :gift_card_subtotal_in_cents
+      ]
     end
 
     def subtotal
@@ -78,7 +84,7 @@ module Tray
     end
 
     def ticket_package_fees_in_cents
-      line_items.by_ticket_package.reduce(0) {|memo, package| memo += package.entity.package_fee_in_cents}
+      line_items.by_ticket_package.reduce(0) { |memo, package| memo += package.entity.package_fee_in_cents }
     end
 
     def membership_discount_total
@@ -115,6 +121,12 @@ module Tray
     def ticket_packages_subtotal_in_cents
       line_items.by_ticket_package.reduce(0) do |memo, item|
         memo += (item.entity.customer_price_in_cents || 0).to_i
+      end
+    end
+
+    def gift_card_subtotal_in_cents
+      line_items.by_gift_card.reduce(0) do |memo, item|
+        memo += (item.entity.purchase_price_in_cents || 0).to_i
       end
     end
 
