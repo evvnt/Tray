@@ -38,7 +38,7 @@ module Tray
       end
 
       def by_gift_card
-        select {|li| li.product_model == :gift_card}
+        select {|li| li.product_model == :gift_card_definition}
       end
 
       def by_ticket_package
