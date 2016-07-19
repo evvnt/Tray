@@ -97,7 +97,12 @@ module Tray
       return total_discount || 0
     end
 
-    # private
+    def gift_card_discount_total_in_cents
+      runner = Tray::Calculator::Runner.new(self)
+      total = runner.registers.map(&:reduction_code_credit_total).reduce(:+) || 0
+      return total
+    end
+
     def event_subtotal_in_cents
       line_items.by_ticket.reduce(0) do |memo, item|
         ticket_price = item.entity.price_for_level_in_cents(item.options[:price_level])
@@ -129,8 +134,6 @@ module Tray
         memo += (item.entity.purchase_price_in_cents || 0).to_i
       end
     end
-
-    # TODO: def ticket_package_with_discounts_in_cents
 
     def ticket_packages_in_cents
       line_items.by_ticket_package.reduce(0) do |memo, item|

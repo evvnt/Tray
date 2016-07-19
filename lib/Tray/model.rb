@@ -1,8 +1,8 @@
 require_relative 'crud'
 require_relative 'calculations'
 require_relative 'orm'
-require_relative 'models/gift_card'
-require_relative 'models/gift_card_collection'
+require_relative 'models/reduction_code'
+require_relative 'models/reduction_code_collection'
 require_relative 'models/line_item'
 require_relative 'models/line_item_collection'
 require_relative 'models/promo_code'
@@ -23,7 +23,7 @@ module Tray
     attribute :id, Integer, default: -> _, attribute {UUID.generate}
     attribute :line_items, Models::LineItemCollection[Models::LineItem], default: []
     attribute :promo_codes, Models::PromoCodeCollection[Models::PromoCode], default: []
-    attribute :gift_cards, Models::GiftCardCollection[Models::GiftCard], default: []
+    attribute :reduction_codes, Models::ReductionCodeCollection[Models::ReductionCode], default: []
     attribute :created_at, DateTime, default: -> _, attribute {Time.now}
     attribute :updated_at, DateTime, default: -> _, attribute {Time.now}
     attribute :payment_method_id, Integer

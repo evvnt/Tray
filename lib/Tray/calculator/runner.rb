@@ -43,7 +43,8 @@ module Tray
         [
           Discounters::PromoCode,
           Discounters::Subscriptions,
-          Discounters::Credits
+          Discounters::Credits,
+          Discounters::ReductionCode
         ]
       end
 

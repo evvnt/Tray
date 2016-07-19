@@ -17,7 +17,7 @@ module Tray
           total - discount_code.amount.to_f * 100
         end
       end
-      
+
     end
   end
 end

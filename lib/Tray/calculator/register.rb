@@ -10,10 +10,11 @@ module Tray
       attribute :applied_codes, Array[Hash], default: []
       attribute :applied_credits, Array[Hash], default: []
       attribute :applied_subscriptions, Array[Hash], default: []
+      attribute :applied_reduction_codes, Array[Hash], default: []
 
       def discounted_total
         ttl_with_delivery_fee = line_items_total + delivery_fee_in_cents
-        ttl_less_credits = ttl_with_delivery_fee - credit_discount
+        ttl_less_credits = ttl_with_delivery_fee - credit_discount - reduction_code_credit_total
         ttl_less_percent = ttl_less_credits - (ttl_less_credits * ([percent_discount, 0].max.to_f * 0.01))
         #Totals Can't Go Negative
         [ttl_less_percent, 0.0].max
@@ -44,6 +45,10 @@ module Tray
 
       def promo_code_credit_total
         applied_codes.select {|h| h[:type] == :credit}.map {|h| h[:amount] }.flatten.reduce(:+).to_i
+      end
+
+      def reduction_code_credit_total
+        applied_reduction_codes.map {|h| h[:amount]}.flatten.reduce(:+).to_i
       end
 
       def membership_fixed_total

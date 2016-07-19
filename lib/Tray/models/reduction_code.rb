@@ -1,6 +1,6 @@
 module Tray
   module Models
-    class GiftCard
+    class ReductionCode
       include Virtus.model
       attribute :gift_card_id, Integer
 
@@ -10,7 +10,7 @@ module Tray
 
       def apply_to_total(total)
         total = total.to_f
-        if gift_card.card_type == 'Package'
+        if @gift_card.card_type == 'Package'
           # TODO
         else
           [(total - gift_card.current_amount_in_cents.to_f * 100), 0].max
