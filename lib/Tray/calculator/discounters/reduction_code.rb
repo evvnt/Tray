@@ -22,7 +22,7 @@ module Tray
           # if code.gift_card.card_type = 'Package'
           #   # TODO
           # else
-            card_amount = code.gift_card.current_value_in_cents.to_f * 100.0
+            card_amount = code.gift_card.current_value_in_cents
             registers.each do |reg|
               if reg.line_items_total - card_amount >= 0
                 discount = card_amount
