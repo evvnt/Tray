@@ -29,6 +29,7 @@ module Tray
     attribute :payment_method_id, Integer
     attribute :shipping_address_id, Integer
     attribute :customer_id, Integer
+    attribute :errors, Array, default: []
 
     def shipping_address
       return unless shipping_address_id
@@ -45,6 +46,9 @@ module Tray
       @customer ||= Customer.find(customer_id)
     end
 
+    def add_error(error_msg)
+      errors.push(error_msg)
+    end
 
   end
 end
