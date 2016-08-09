@@ -35,8 +35,9 @@ module Tray
         line_items.first.delivery_fee
       end
 
+      # Call and sum all fixed amount discounts
       def credit_discount
-        promo_code_credit_total + customer_credits_total + membership_fixed_total
+        promo_code_credit_total + promo_code_percent_total + customer_credits_total + membership_fixed_total
       end
 
       def customer_credits_total
@@ -51,20 +52,25 @@ module Tray
         applied_reduction_codes.map {|h| h[:amount]}.flatten.reduce(:+).to_i
       end
 
+      def promo_code_percent_total
+        # This is a percentage based discount, but we're calculating it when populating `applied_codes` since it can be filtered on the line item level
+        # Keeping this a separate method for clarity
+        applied_codes.select {|h| h[:type] == :percentage}.map {|h| h[:amount] }.flatten.reduce(:+).to_i
+      end
+
       def membership_fixed_total
         applied_subscriptions.select {|h| h[:type] == :fixed}.map {|h| h[:amount] }.flatten.reduce(:+).to_i
+      end
+
+      # Call and sum all percentage based discounts
+      def percent_discount
+        membership_discount_total
       end
 
       def membership_discount_total
         applied_subscriptions.select {|h| h[:type] == :percentage}.map {|h| h[:amount] }.flatten.reduce(:+).to_i
       end
 
-      def percent_discount
-        codes_off = applied_codes.select {|h| h[:type] == :percentage}.map {|h| h[:amount] }.flatten.reduce(:+).to_i
-        subscriptions_off = membership_discount_total
-
-        codes_off + subscriptions_off
-      end
     end
   end
 end
