@@ -20,6 +20,7 @@ module Tray
         def applicable_registers(code)
           @registers.select do |register|
             next false unless code.gift_card.organization_id == register.event.organization_id
+            next false if code.gift_card.event_exclusions.include?(register.event.id)
             if code.gift_card.card_type == 'Package'
               next false if code.gift_card.remaining_tickets == 0
               # Check events in package against the ones in the register
