@@ -16,7 +16,7 @@ module Tray
             elsif subscription.fixed?
               apply_fixed_subscription_registers(subscription, _applicable_registers)
             end
-              
+
           end
         end
 
@@ -27,14 +27,28 @@ module Tray
         end
 
         def apply_discount_subscription_registers(subscription, registers)
-          amount = subscription.membership.amount.to_f * 100.0
-          registers.each {|reg| reg.applied_subscriptions.push({subscription: subscription, amount: amount, type: :percentage})}
+          amount = subscription.membership.amount.to_f # * 100.0
+          registers.each {|reg|
+            discount = percent_discount_in_cents_by_line_item(reg.line_items, amount)
+            reg.applied_subscriptions.push({subscription: subscription, amount: discount, description: "#{(amount * 100.0)}%", type: :percentage})
+          }
         end
 
         def apply_fixed_subscription_registers(subscription, registers)
           amount = subscription.membership.amount.to_i
-          registers.each {|reg| reg.applied_subscriptions.push({subscription: subscription, amount: amount, type: :fixed})}
+          registers.each {|reg| reg.applied_subscriptions.push({subscription: subscription, amount: amount, description: amount, type: :fixed})}
         end
+
+        private
+        def percent_discount_in_cents_by_line_item(line_items, amount = 0.0)
+          discount = 0
+          line_items.each do |item|
+            ticket_price = item.entity.price_for_level_in_cents(item.options[:price_level])
+            discount += ticket_price * amount
+          end
+          return discount
+        end
+
       end
     end
   end

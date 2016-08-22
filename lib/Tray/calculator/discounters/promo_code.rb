@@ -61,7 +61,6 @@ module Tray
           registers.each do |reg|
             reg.line_items.each do |item|
               if discount_code.applicable_events.include?(item.entity.event_id.to_s) && discount_code.applicable_events[item.entity.event_id.to_s].include?(item.entity.id)
-                Rails.logger.warn "#{item.entity.event_id} #{item.entity.id}"
                 total += item.entity.price_for_level_in_cents(item.options[:price_level])
               end
             end

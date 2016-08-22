@@ -14,10 +14,11 @@ module Tray
 
       def discounted_total
         ttl_with_delivery_fee = line_items_total + delivery_fee_in_cents
-        ttl_less_credits = ttl_with_delivery_fee - credit_discount - reduction_code_credit_total
-        ttl_less_percent = ttl_less_credits - (ttl_less_credits * ([percent_discount, 0].max.to_f * 0.01))
+        ttl_less_credits = ttl_with_delivery_fee - customer_credits_total
+        ttl_less_membership = ttl_less_credits - membership_discount_total
+        ttl_less_reduction = ttl_less_membership - reduction_code_credit_total
         #Totals Can't Go Negative
-        [ttl_less_percent, 0.0].max
+        [ttl_less_reduction, 0.0].max
       end
 
       def bare_ticket_cost
@@ -35,40 +36,44 @@ module Tray
         line_items.first.delivery_fee
       end
 
-      # Call and sum all fixed amount discounts
-      def credit_discount
-        promo_code_credit_total + promo_code_percent_total + customer_credits_total + membership_fixed_total
-      end
-
+      # Total customer credit available
       def customer_credits_total
         applied_credits.map {|h| h[:amount] }.flatten.reduce(:+).to_i
       end
 
-      def promo_code_credit_total
-        applied_codes.select {|h| h[:type] == :credit}.map {|h| h[:amount] }.flatten.reduce(:+).to_i
-      end
-
+      # Total reduction code credit
       def reduction_code_credit_total
         applied_reduction_codes.map {|h| h[:amount]}.flatten.reduce(:+).to_i
       end
 
+      # Total promo code discount
+      def promo_code_total
+        promo_code_credit_total + promo_code_percent_total
+      end
+
+      # Total discount amount from $ based promo codes
+      def promo_code_credit_total
+        applied_codes.select {|h| h[:type] == :credit}.map {|h| h[:amount] }.flatten.reduce(:+).to_i || 0
+      end
+
+      # Total discount amount from % based promo codes (Calculated in Discounters::PromoCode)
       def promo_code_percent_total
-        # This is a percentage based discount, but we're calculating it when populating `applied_codes` since it can be filtered on the line item level
-        # Keeping this a separate method for clarity
-        applied_codes.select {|h| h[:type] == :percentage}.map {|h| h[:amount] }.flatten.reduce(:+).to_i
+        applied_codes.select {|h| h[:type] == :percentage}.map {|h| h[:amount] }.flatten.reduce(:+).to_i || 0
       end
 
-      def membership_fixed_total
-        applied_subscriptions.select {|h| h[:type] == :fixed}.map {|h| h[:amount] }.flatten.reduce(:+).to_i
-      end
-
-      # Call and sum all percentage based discounts
-      def percent_discount
-        membership_discount_total
-      end
-
+      # Totals membership discount amount
       def membership_discount_total
-        applied_subscriptions.select {|h| h[:type] == :percentage}.map {|h| h[:amount] }.flatten.reduce(:+).to_i
+        membership_fixed_total + membership_percent_total
+      end
+
+      # Membership discount $ amounts
+      def membership_fixed_total
+        applied_subscriptions.select {|h| h[:type] == :fixed}.map {|h| h[:amount] }.flatten.reduce(:+).to_i || 0
+      end
+
+      # Membership discount % amounts (calculated in Discounters::Subscriptions)
+      def membership_percent_total
+        applied_subscriptions.select {|h| h[:type] == :percentage}.map {|h| h[:amount] }.flatten.reduce(:+).to_i || 0
       end
 
     end

@@ -89,12 +89,8 @@ module Tray
 
     def membership_discount_total
       runner = Tray::Calculator::Runner.new(self)
-      fixed_total = runner.registers.map(&:membership_fixed_total).reduce(:+) || 0
-      discount_total = runner.registers.map(&:membership_discount_total).reduce(:+) || 0 # This is returning a percentage
-      if ((fixed_total + discount_total) > 0) # Discounts have been applied to total_in_cents, determine the total discount amount
-        total_discount = (subtotal_in_cents + ticket_fees_in_cents + delivery_fees_in_cents) - (credits_available_in_cents + total_in_cents)
-      end
-      return total_discount || 0
+      total = runner.registers.map(&:membership_discount_total).reduce(:+) || 0
+      return total
     end
 
     def gift_card_discount_total_in_cents
