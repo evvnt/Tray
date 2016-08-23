@@ -14,7 +14,7 @@ module Tray
 
       def discounted_total
         ttl_with_delivery_fee = line_items_total + delivery_fee_in_cents
-        ttl_less_credits = ttl_with_delivery_fee - customer_credits_total
+        ttl_less_credits = ttl_with_delivery_fee - customer_credits_total - promo_code_total
         ttl_less_membership = ttl_less_credits - membership_discount_total
         ttl_less_reduction = ttl_less_membership - reduction_code_credit_total
         #Totals Can't Go Negative
