@@ -44,11 +44,10 @@ module Tray
         private
         def percent_discount_in_cents_by_line_item(line_items, discount_code)
           return 0 unless discount_code.percentage?
-          return discount_code.amount if discount_code.applies_to_all_events
           discount = 0
           line_items.each do |item|
-            if discount_code.applicable_events.include?(item.entity.event_id.to_s) && discount_code.applicable_events[item.entity.event_id.to_s].include?(item.entity.id)
-              ticket_price = item.entity.price_for_level_in_cents(item.options[:price_level])
+            if discount_code.applies_to_all_events || discount_code.applicable_events.include?(item.entity.event_id) && discount_code.applicable_events[item.entity.event_id].include?(item.entity.id)
+              ticket_price = item.entity.price_for_level_in_cents_without_fee(item.options[:price_level]) + item.entity.fee_for_level_in_cents(item.options[:price_level])
               discount += ticket_price * ([discount_code.amount.to_i, 0].max.to_f * 0.01)
             end
           end
@@ -60,8 +59,8 @@ module Tray
           total = 0
           registers.each do |reg|
             reg.line_items.each do |item|
-              if discount_code.applicable_events.include?(item.entity.event_id.to_s) && discount_code.applicable_events[item.entity.event_id.to_s].include?(item.entity.id)
-                total += item.entity.price_for_level_in_cents(item.options[:price_level])
+              if discount_code.applicable_events.include?(item.entity.event_id) && discount_code.applicable_events[item.entity.event_id].include?(item.entity.id)
+                total += item.entity.price_for_level_in_cents_without_fee(item.options[:price_level]) + item.entity.fee_for_level_in_cents(item.options[:price_level])
               end
             end
           end

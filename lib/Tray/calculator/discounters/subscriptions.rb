@@ -43,7 +43,7 @@ module Tray
         def percent_discount_in_cents_by_line_item(line_items, amount = 0.0)
           discount = 0
           line_items.each do |item|
-            ticket_price = item.entity.price_for_level_in_cents(item.options[:price_level])
+            ticket_price = item.entity.price_for_level_in_cents_without_fee(item.options[:price_level]) + item.entity.fee_for_level_in_cents(item.options[:price_level])
             discount += ticket_price * amount
           end
           return discount
