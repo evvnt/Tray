@@ -46,9 +46,10 @@ module Tray
           return 0 unless discount_code.percentage?
           discount = 0
           line_items.each do |item|
-            if discount_code.applies_to_all_events || discount_code.applicable_events.include?(item.entity.event_id) && discount_code.applicable_events[item.entity.event_id].include?(item.entity.id)
-              ticket_price = item.entity.price_for_level_in_cents_without_fee(item.options[:price_level]) + item.entity.fee_for_level_in_cents(item.options[:price_level])
-              discount += ticket_price * ([discount_code.amount.to_i, 0].max.to_f * 0.01)
+            #binding.pry
+            if code_applies_to_item?(discount_code, item)
+              price = entity_price(item)
+              discount += price * ([discount_code.amount.to_i, 0].max.to_f * 0.01)
             end
           end
           return discount
@@ -59,12 +60,29 @@ module Tray
           total = 0
           registers.each do |reg|
             reg.line_items.each do |item|
-              if discount_code.applicable_events.include?(item.entity.event_id) && discount_code.applicable_events[item.entity.event_id].include?(item.entity.id)
-                total += item.entity.price_for_level_in_cents_without_fee(item.options[:price_level]) + item.entity.fee_for_level_in_cents(item.options[:price_level])
-              end
+              total += entity_price(item) if codes_applies_to_item?(discount_code, item)
             end
           end
           return total
+        end
+
+        def code_applies_to_item?(discount_code, item)
+          code_applies_to_ticket?(discount_code, item) || code_applies_to_package?(discount_code, item)
+        end
+
+        def code_applies_to_ticket?(discount_code, item)
+          return false unless item.product_model == :ticket
+          discount_code.applies_to_all_events || discount_code.applicable_events.include?(item.entity.event_id) && discount_code.applicable_events[item.entity.event_id].include?(item.entity.id)
+        end
+
+        def code_applies_to_package?(discount_code, item)
+          return false unless item.product_model == :ticket_package
+          discount_code.applicable_packages.include?(item.product_id)
+        end
+
+        def entity_price(item)
+          return item.entity.price_for_level_in_cents_without_fee(item.options[:price_level]) + item.entity.fee_for_level_in_cents(item.options[:price_level]) || 0 if item.product_model == :ticket
+          return item.entity.price_in_cents + item.entity.package_fee_in_cents || 0 if item.product_model == :ticket_package
         end
 
       end
