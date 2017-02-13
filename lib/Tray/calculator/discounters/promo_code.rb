@@ -46,7 +46,6 @@ module Tray
           return 0 unless discount_code.percentage?
           discount = 0
           line_items.each do |item|
-            #binding.pry
             if code_applies_to_item?(discount_code, item)
               price = entity_price(item)
               discount += price * ([discount_code.amount.to_i, 0].max.to_f * 0.01)

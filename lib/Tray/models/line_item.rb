@@ -19,8 +19,9 @@ module Tray
       end
 
       def delivery_fee
-        return 0 unless options[:delivery_method].to_s == "mail" && product_model == :ticket
-        entity.event.mailing_fee_in_cents
+        return entity.event.mailing_fee_in_cents if options[:delivery_method].to_s == "mail" && product_model == :ticket
+        return entity.mailing_fee_in_cents if options[:delivery_method].to_s == "mail" && product_model == :ticket_package
+        return 0
       end
 
       def valid?
