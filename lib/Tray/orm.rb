@@ -21,7 +21,6 @@ module Tray
 
     def update_delivery_method(options = {})
       if options[:ticket_package_id].present?
-        puts options[:ticket_package_id]
         line_items.by_ticket_package.find {|li| li.id == options[:ticket_package_id]}.tap do |li|
           li_options = li.options.clone
           li_options[:delivery_method] = options[:delivery_method]
