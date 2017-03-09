@@ -59,7 +59,7 @@ module Tray
           total = 0
           registers.each do |reg|
             reg.line_items.each do |item|
-              total += entity_price(item) if codes_applies_to_item?(discount_code, item)
+              total += entity_price(item) if code_applies_to_item?(discount_code, item)
             end
           end
           return total
