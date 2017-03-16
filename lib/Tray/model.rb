@@ -29,6 +29,7 @@ module Tray
     attribute :payment_method_id, Integer
     attribute :shipping_address_id, Integer
     attribute :customer_id, Integer
+    attribute :guest_configuration, Hash, default: {}
     attribute :errors, Array, default: []
 
     def shipping_address
