@@ -89,7 +89,7 @@ module Tray
     def membership_discount_total
       runner = Tray::Calculator::Runner.new(self)
       total = runner.registers.map(&:membership_discount_total).reduce(:+) || 0
-      return total
+      return [total, subtotal_in_cents].min
     end
 
     def gift_card_discount_total_in_cents
