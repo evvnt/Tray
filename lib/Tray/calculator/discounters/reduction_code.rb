@@ -19,11 +19,21 @@ module Tray
 
         def applicable_registers(code)
           @registers.select do |register|
-            next false unless code.gift_card.organization_id == register.event.organization_id
-            next false if code.gift_card.event_exclusions.include?(register.event.id)
+            next true if applies_to_event(code, register)
+            next true if applies_to_package(code, register)
             next false if (code.gift_card.valid_range_start && code.gift_card.valid_range_start > Time.now) || (code.gift_card.valid_range_end && code.gift_card.valid_range_end < Time.now)
             next true
           end
+        end
+
+        def applies_to_event(code, register)
+          register.event.present? &&
+            code.gift_card.organization_id == register.event.organization_id &&
+              !code.gift_card.event_exclusions.include?(register.event.id)
+        end
+
+        def applies_to_package(code, register)
+          register.package.present? && code.gift_card.organization_id == register.package.entity.organization_id
         end
 
         def apply_reduction_code_registers(code, registers)
