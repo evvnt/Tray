@@ -22,6 +22,7 @@ module Tray
 
         def applicable_registers(subscription)
           @registers.select do |register|
+            next false if register.package.present?
             next true if subscription.organization_id == register.event.organization_id && register.event.memberships_apply
           end
         end
