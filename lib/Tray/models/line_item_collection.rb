@@ -56,7 +56,7 @@ module Tray
         end
 
         if model === :ticket_package
-          return delete(select {|item| item.product_model == model && item.product_id == id })
+          return delete_if {|item| item.product_model == model && item.product_id == id }
         end
 
         if item = find {|item| item.product_model == model && item.product_id == id}
