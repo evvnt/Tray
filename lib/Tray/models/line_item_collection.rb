@@ -51,9 +51,12 @@ module Tray
       end
 
       def decrement(model, id, seatId)
-
         if seatId.present?
           return delete(find {|item| item.product_model == model && item.product_id == id && item.options[:seat_id] == seatId })
+        end
+
+        if model === :ticket_package
+          return delete_if {|item| item.product_model == model && item.product_id == id }
         end
 
         if item = find {|item| item.product_model == model && item.product_id == id}
