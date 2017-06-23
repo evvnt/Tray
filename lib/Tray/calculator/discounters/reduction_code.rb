@@ -39,12 +39,8 @@ module Tray
         def apply_reduction_code_registers(code, registers)
           card_amount = code.gift_card.current_value_in_cents
           registers.each do |reg|
-            line_items_total = reg.line_items_total - reg.membership_discount_total # Calculate the $ amount of gift card used after the membership discounts have been applied
-            if line_items_total - card_amount >= 0
-              discount = card_amount
-            else
-              discount = line_items_total
-            end
+            # Calculate the $ amount of gift card used after discounts have been applied
+            discount = [card_amount, reg.discounted_total].min
             card_amount = card_amount - discount
             reg.applied_reduction_codes.push({card: code, amount: discount, type: :credit})
           end
