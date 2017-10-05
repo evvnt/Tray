@@ -31,6 +31,7 @@ module Tray
     attribute :customer_id, Integer
     attribute :guest_configuration, Hash, default: {}
     attribute :errors, Array, default: []
+    attribute :guest_card, Hash, default: {}
 
     def shipping_address
       return unless shipping_address_id
