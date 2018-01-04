@@ -6,8 +6,8 @@ module Tray
         super(discount)
       end
 
-      def <<(discount)
-        push(discount)
+      def <<(event_id, discount_amount)
+        push(event_id, discount_amount)
       end
     end
   end
