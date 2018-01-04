@@ -11,12 +11,14 @@ module Tray
       attribute :applied_credits, Array[Hash], default: []
       attribute :applied_subscriptions, Array[Hash], default: []
       attribute :applied_reduction_codes, Array[Hash], default: []
+      attribute :applied_quantity_discount_amount, Integer, default: 0
 
       def discounted_total
         ttl_with_delivery_fee = line_items_total + delivery_fee_in_cents
         ttl_less_credits = ttl_with_delivery_fee - customer_credits_total - promo_code_total
         ttl_less_membership = ttl_less_credits - membership_discount_total
-        ttl_less_reduction = ttl_less_membership - reduction_code_credit_total
+        ttl_less_quantity_discount = ttl_less_membership - quantity_discount_total
+        ttl_less_reduction = ttl_less_quantity_discount - reduction_code_credit_total
         #Totals Can't Go Negative
         [ttl_less_reduction, 0.0].max
       end
@@ -64,6 +66,10 @@ module Tray
       # Totals membership discount amount
       def membership_discount_total
         membership_fixed_total + membership_percent_total
+      end
+
+      def quantity_discount_total
+        applied_quantity_discount_amount
       end
 
       # Membership discount $ amounts
