@@ -6,8 +6,12 @@ module Tray
         super(discount)
       end
 
-      def <<(event_id, discount_amount)
-        push(event_id, discount_amount)
+      def <<(quantity_discount)
+        if quantity_discount.kind_of?(Hash)
+           super(QuantityDiscount.new(quantity_discount))
+        else
+           super
+        end
       end
     end
   end
