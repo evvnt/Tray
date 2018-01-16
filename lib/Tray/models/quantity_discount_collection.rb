@@ -1,8 +1,9 @@
 module Tray
   module Models
     class QuantityDiscountCollection < Array
-      def push(event_id, discount_amount)
-        discount = QuantityDiscount.new(event_id: event_id, discount_amount: discount_amount)
+      def push(quantity_discount)
+        self.delete_if{ |e| e.event_id == quantity_discount[:event_id] }
+        discount = QuantityDiscount.new(quantity_discount)
         super(discount)
       end
 
