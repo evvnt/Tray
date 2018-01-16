@@ -22,9 +22,14 @@ module Tray
         end
 
         def apply_code_registers(qd, registers)
+          clear_current_amounts(registers)
           registers.each do |reg|
             reg.applied_quantity_discount_amount += qd.discount_amount
           end
+        end
+
+        def clear_current_amounts(registers)
+          registers.each { |reg| reg.applied_quantity_discount_amount = 0 }
         end
 
       end
