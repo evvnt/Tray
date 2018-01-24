@@ -44,7 +44,8 @@ module Tray
           Discounters::PromoCode,
           Discounters::Subscriptions,
           Discounters::Credits,
-          Discounters::ReductionCode
+          Discounters::ReductionCode,
+          Discounters::QuantityDiscount
         ]
       end
 

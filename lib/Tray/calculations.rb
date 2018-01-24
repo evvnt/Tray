@@ -98,6 +98,12 @@ module Tray
       return total
     end
 
+    def quantity_discount_total_in_cents
+      runner = Tray::Calculator::Runner.new(self)
+      total = runner.registers.map(&:quantity_discount_total).reduce(:+) || 0
+      return total
+    end
+
     def event_subtotal_in_cents
       line_items.by_ticket.reduce(0) do |memo, item|
         ticket_price = item.entity.price_for_level_in_cents(item.options[:price_level])
