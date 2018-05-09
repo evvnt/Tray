@@ -11,7 +11,8 @@ module Tray
     def total_in_cents
       [
           :subtotal_with_discounts_in_cents,
-          :ticket_package_fees_in_cents
+          :ticket_package_fees_in_cents,
+          :item_fees_in_cents
       ].concat(tag_ons_subtotal_method_array).map { |meth| method(meth).call }.sum
     end
 
@@ -70,6 +71,22 @@ module Tray
       end
 
       event_fees + ticket_packages_mail_fees_in_cents
+    end
+
+    def item_fees_in_cents
+      line_items.reduce(0) do |memo, item|
+        memo += item.item_fees.map{ |item_fee| item_fee['amount_in_cents'] }.sum
+      end
+    end
+
+    def item_fees_by_type
+      cart_item_fees = Hash.new(0)
+      line_items.each do |item|
+        item.item_fees.each do |item_fee|
+          cart_item_fees[item_fee['name']] += item_fee['amount_in_cents']
+        end
+      end
+      cart_item_fees
     end
 
     def customer_ticket_package_fees_in_cents
