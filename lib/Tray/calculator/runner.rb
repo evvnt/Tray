@@ -25,11 +25,11 @@ module Tray
       end
 
       def total_for_org(org_id)
-        @registers.select{|reg| reg.event.organization_id == org_id }.map(&:discounted_total).reduce(:+)
+        @registers.select{|reg| reg.organization_id == org_id }.map(&:discounted_total).reduce(:+)
       end
 
       def ticket_fee_total_for_org(org_id)
-        @registers.select{|reg| reg.event.organization_id == org_id }.map(&:ticket_fees_in_cents).reduce(:+)
+        @registers.select{|reg| reg.organization_id == org_id }.map(&:ticket_fees_in_cents).reduce(:+)
       end
 
       def add

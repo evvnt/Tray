@@ -82,6 +82,11 @@ module Tray
         applied_subscriptions.select {|h| h[:type] == :percentage}.map {|h| h[:amount] }.flatten.reduce(:+).to_i || 0
       end
 
+      def organization_id
+        return package.entity.organization_id if package.present?
+        event.organization_id
+      end
+
     end
   end
 end
