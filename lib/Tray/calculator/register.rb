@@ -24,6 +24,7 @@ module Tray
       end
 
       def ticket_fees_in_cents
+        return package.entity.package_fee_in_cents if package.present?
         line_items.reduce(0) do |memo, item|
           ticket_fee = item.entity.fee_for_level_in_cents(item.options[:price_level])
           memo += ticket_fee * (item.quantity || 1)
