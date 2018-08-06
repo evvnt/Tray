@@ -26,7 +26,9 @@ module Tray
       end
 
       def by_organization
-        by_ticket.group_by {|li| li.entity.event.organization_id}
+        tickets = by_ticket.group_by {|li| li.entity.event.organization_id}
+        packages = by_ticket_package.group_by{|li| li.entity.organization_id}
+        tickets.merge(packages)
       end
 
       def by_membership
