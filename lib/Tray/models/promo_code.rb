@@ -3,19 +3,49 @@ module Tray
     class PromoCode
       include Virtus.model
 
-      attribute :discount_code_id, Integer
+      attribute :discount_promo_code_id, Integer
 
-      def discount_code
-        @discount_code ||= Cart::PRODUCT_KEYS.invert[:discount].find(discount_code_id)
+      def discount_promo_code
+        @discount_promo_code ||= Cart::PRODUCT_KEYS.invert[:discount].find(discount_promo_code_id)
       end
 
-      def apply_to_total(total)
-        total = total.to_f
-        if discount_code.amount_type == "percentage"
-          total - (total * (discount_code.amount.to_f / 100.0))
+      def calc_discount(amount_in_cents)
+        if percentage?
+          amount = BigDecimal(discount_promo_code.percentage * amount_in_cents) / BigDecimal(100)
+          rounded = amount.round(0, :banker)
+          rounded.to_i
         else
-          total - discount_code.amount.to_f * 100
+          return amount_in_cents unless discount_promo_code.amount_in_cents < amount_in_cents
+          discount_promo_code.amount_in_cents
         end
+      end
+
+      def applies_to_all_events
+        discount_promo_code.applies_to_all_events
+      end
+
+      def applicable_events
+        discount_promo_code.applicable_events
+      end
+
+      def event_ids
+        discount_promo_code.event_ids
+      end
+
+      def organization_id
+        discount_promo_code.organization_id
+      end
+
+      def percentage?
+        discount_promo_code.calc_type == "percentage"
+      end
+
+      def percentage
+        discount_promo_code.percentage
+      end
+
+      def amount_in_cents
+        discount_promo_code.amount_in_cents
       end
 
     end
