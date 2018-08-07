@@ -23,10 +23,11 @@ module Tray
         [ttl_less_reduction, 0.0].max
       end
 
-      def bare_ticket_cost
+      def ticket_fees_in_cents
+        return package.entity.package_fee_in_cents if package.present?
         line_items.reduce(0) do |memo, item|
-          ticket_price = item.entity.price_for_level_in_cents(item.options[:price_level])
-          memo += ticket_price * (item.quantity || 1)
+          ticket_fee = item.entity.fee_for_level_in_cents(item.options[:price_level])
+          memo += ticket_fee * (item.quantity || 1)
         end
       end
 
@@ -80,6 +81,11 @@ module Tray
       # Membership discount % amounts (calculated in Discounters::Subscriptions)
       def membership_percent_total
         applied_subscriptions.select {|h| h[:type] == :percentage}.map {|h| h[:amount] }.flatten.reduce(:+).to_i || 0
+      end
+
+      def organization_id
+        return package.entity.organization_id if package.present?
+        event.organization_id
       end
 
     end

@@ -24,14 +24,6 @@ module Tray
         return 0
       end
 
-      def item_fees
-        if product_model == :ticket
-          options[:price_level].present? ? entity.item_fees(options[:price_level]) : {}
-        else
-          entity.try(:item_fees) || []
-        end
-      end
-
       def valid?
         return true unless product_model == :ticket_package
         return true if options[:finished]
