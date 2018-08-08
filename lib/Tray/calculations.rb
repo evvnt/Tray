@@ -10,8 +10,7 @@ module Tray
 
     def total_in_cents
       [
-          :subtotal_with_discounts_in_cents,
-          :ticket_package_fees_in_cents
+          :subtotal_with_discounts_in_cents
       ].concat(tag_ons_subtotal_method_array).map { |meth| method(meth).call }.sum
     end
 
