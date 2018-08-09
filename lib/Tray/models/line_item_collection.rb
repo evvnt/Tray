@@ -26,7 +26,7 @@ module Tray
       end
 
       def by_organization
-        by_ticket.group_by {|li| li.entity.event.organization_id}
+        map {|li| li.entity.organization_id }.uniq
       end
 
       def by_membership
