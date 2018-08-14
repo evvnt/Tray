@@ -14,8 +14,8 @@ module Tray
         def applicable_registers(code)
           @registers.select do |register|
             if register.event.present?
-              next true if code.event_ids.length > 0 && code.event_ids.include?(register.event.id) && Array(code.applicable_events[register.event.id.to_s] & register.line_items.map(&:product_id)).length > 0
-              next true if code.event_ids.length == 0 && code.organization_id == register.event.organization_id && code.applies_to_all_events
+              next true if code.event_ids.length > 0 && code.event_ids.include?(register.event.id)
+              next true if code.applies_to_all_events && code.organization_id == register.event.organization_id
             end
             next false
           end
@@ -50,7 +50,7 @@ module Tray
 
         def code_applies_to_ticket?(discount_code, item)
           return false unless item.product_model == :ticket
-          discount_code.applies_to_all_events || discount_code.applicable_events.include?(item.entity.event_id) && discount_code.applicable_events[item.entity.event_id].include?(item.entity.id)
+          discount_code.applies_to_all_events || discount_code.event_ids.include?(item.entity.event_id)
         end
 
         def entity_price(item)

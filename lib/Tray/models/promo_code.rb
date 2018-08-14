@@ -24,10 +24,6 @@ module Tray
         discount_promo_code.applies_to_all_events
       end
 
-      def applicable_events
-        discount_promo_code.applicable_events
-      end
-
       def event_ids
         discount_promo_code.event_ids
       end
