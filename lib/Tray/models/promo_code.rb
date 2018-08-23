@@ -28,6 +28,10 @@ module Tray
         discount_promo_code.event_ids
       end
 
+      def ticket_type_ids
+        discount_promo_code.ticket_type_ids
+      end
+
       def organization_id
         discount_promo_code.organization_id
       end
