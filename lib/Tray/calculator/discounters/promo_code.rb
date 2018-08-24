@@ -15,12 +15,8 @@ module Tray
           @registers.select do |register|
             if register.event.present?
               next true if code.applies_to_all_events && code.organization_id == register.event.organization_id
-              next true if code.event_ids.length > 0 && code.event_ids.include?(register.event.id)
-              if code.ticket_type_ids.length > 0
-                register.line_items.by_ticket.each do |item|
-                  next true if code.ticket_type_ids.include?(item.entity.id)
-                end
-              end
+              next true if code.event_restricted? && code.event_ids.include?(register.event.id)
+              next true if code.ticket_restricted? && register.line_items.by_ticket.any? {|item| code.ticket_type_ids.include?(item.entity.id)}
             end
             next false
           end
@@ -56,8 +52,8 @@ module Tray
         def code_applies_to_ticket?(code, item)
           return false unless item.product_model == :ticket
           code.applies_to_all_events ||
-              (code.event_ids.length > 0 && code.event_ids.include?(item.entity.event_id)) ||
-              (code.ticket_type_ids.length > 0 && code.ticket_type_ids.include?(item.entity.id))
+              (code.event_restricted? && code.event_ids.include?(item.entity.event_id)) ||
+              (code.ticket_restricted? && code.ticket_type_ids.include?(item.entity.id))
         end
 
         def entity_price(item)

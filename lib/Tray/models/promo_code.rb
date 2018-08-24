@@ -24,6 +24,14 @@ module Tray
         discount_promo_code.applies_to_all_events
       end
 
+      def event_restricted?
+        event_ids.length > 0
+      end
+
+      def ticket_restricted?
+        ticket_type_ids.length > 0
+      end
+
       def event_ids
         discount_promo_code.event_ids
       end
