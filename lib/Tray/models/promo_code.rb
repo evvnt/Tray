@@ -14,10 +14,17 @@ module Tray
           amount = BigDecimal(discount_promo_code.percentage * amount_in_cents) / BigDecimal(100)
           rounded = amount.round(0, :banker)
           rounded.to_i
+        elsif comp?
+          amount_in_cents
         else
           return amount_in_cents unless discount_promo_code.amount_in_cents < amount_in_cents
           discount_promo_code.amount_in_cents
         end
+      end
+
+      def calc_fee_discount(fee_amount_in_cents)
+        return 0 unless comp?
+        fee_amount_in_cents
       end
 
       def applies_to_all_events
@@ -46,6 +53,10 @@ module Tray
 
       def percentage?
         discount_promo_code.calc_type == "percentage"
+      end
+
+      def comp?
+        discount_promo_code.calc_type == "comp"
       end
 
       def percentage

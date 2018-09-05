@@ -39,7 +39,8 @@ module Tray
           line_items.each do |item|
             if code_applies_to_item?(discount_code, item)
               price = entity_price(item)
-              discount += discount_code.calc_discount(price)
+              fee = entity_fee(item)
+              discount += discount_code.calc_discount(price) + discount_code.calc_fee_discount(fee)
             end
           end
           discount
@@ -58,6 +59,10 @@ module Tray
 
         def entity_price(item)
           item.entity.price_for_level_in_cents_without_fee(item.options[:price_level]) || 0 if item.product_model == :ticket
+        end
+
+        def entity_fee(item)
+          item.entity.fee_for_level_in_cents(item.options[:price_level]) || 0 if item.product_model == :ticket
         end
 
       end
