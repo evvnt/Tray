@@ -41,12 +41,12 @@ module Tray
 
       # Total customer credit available
       def customer_credits_total
-        applied_credits.map {|h| h[:amount] }.flatten.reduce(:+).to_i
+        applied_credits.map {|h| h[:amount] }.flatten.reduce(:+).to_i || 0
       end
 
       # Total reduction code credit
       def reduction_code_credit_total
-        applied_reduction_codes.map {|h| h[:amount]}.flatten.reduce(:+).to_i
+        applied_reduction_codes.map {|h| h[:amount]}.flatten.reduce(:+).to_i || 0
       end
 
       # Total promo code discount

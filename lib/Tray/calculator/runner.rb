@@ -28,6 +28,14 @@ module Tray
         @registers.select{|reg| reg.organization_id == org_id }.map(&:discounted_total).reduce(0, :+)
       end
 
+      # Gift cards and customer credits are payment methods, but are treated as discounts in many of the calculations
+      # here. They should not reduce the taxable amount of the order, hence yet another method:
+      def taxable_total_for_org(org_id)
+        @registers.select{|reg| reg.organization_id == org_id }.map do |r|
+          r.discounted_total + r.reduction_code_credit_total + r.customer_credits_total
+        end.reduce(0, :+)
+      end
+
       def ticket_fee_total_for_org(org_id)
         @registers.select{|reg| reg.organization_id == org_id }.map(&:ticket_fees_in_cents).reduce(0, :+)
       end
