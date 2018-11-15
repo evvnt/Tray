@@ -7,10 +7,6 @@ module Tray
       attribute :discount_amount, Integer
       attribute :quantity_discounts, Array, default: []
 
-      def apply_to_total(total)
-        total.to_f - discount_amount.to_f * 100
-      end
-
     end
   end
 end
