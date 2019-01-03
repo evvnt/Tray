@@ -22,7 +22,7 @@ module Tray
             next true if applies_to_event(code, register)
             next true if applies_to_package(code, register)
             next false if (code.gift_card.valid_range_start && code.gift_card.valid_range_start > Time.now) || (code.gift_card.valid_range_end && code.gift_card.valid_range_end < Time.now)
-            next true
+            next false
           end
         end
 

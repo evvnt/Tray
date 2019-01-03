@@ -5,9 +5,8 @@ module Tray
         class << self
 
           def call(cart, registers)
-            attribs = {totals_by_org: []}
             registers.each do |reg|
-              attribs[:totals_by_org] << {organization_id: reg.organization_id, total_in_cents: taxable_total(reg)}
+              attribs = {totals_by_org: [{organization_id: reg.organization_id, total_in_cents: taxable_total(reg)}]}
               calculate_item_fees(cart, attribs, reg)
             end
           end
