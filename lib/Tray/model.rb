@@ -11,7 +11,6 @@ require_relative 'models/quantity_discount'
 require_relative 'models/quantity_discount_collection'
 require_relative 'calculator/runner'
 
-
 module Tray
   class Model
     include Tray::CRUD

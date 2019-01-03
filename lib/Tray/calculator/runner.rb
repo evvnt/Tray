@@ -1,6 +1,7 @@
 require_relative 'register'
 require_relative 'discounter'
 Dir[File.join(__dir__, 'adders', '*.rb')].each {|file| require file }
+Dir[File.join(__dir__, 'fees', '*.rb')].each {|file| require file }
 Dir[File.join(__dir__, 'discounters', '*.rb')].each {|file| require file }
 
 module Tray
@@ -15,7 +16,7 @@ module Tray
 
       def call
         @registers = add
-
+        fees(@registers)
         discount(@registers)
         total
       end
@@ -49,6 +50,12 @@ module Tray
           Adders::Event,
           Adders::Package
         ]
+      end
+
+      def fees(totals)
+        [
+          Fees::ItemFee
+        ].map {|kls| kls.call(@cart, totals)}
       end
 
       def discount(totals)

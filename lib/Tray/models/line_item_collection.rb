@@ -45,7 +45,6 @@ module Tray
         select {|li| li.product_model == :ticket_package && li.valid?}
       end
 
-
       def quantity
         map(&:quantity).reduce(:+)
       end

@@ -67,7 +67,6 @@ module Tray
       event_fees = line_items.by_event.values.reduce(0) do |memo, items|
         memo += items.first.delivery_fee
       end
-
       event_fees + ticket_packages_mail_fees_in_cents
     end
 
@@ -86,21 +85,36 @@ module Tray
     end
 
     def membership_discount_total
-      runner = Tray::Calculator::Runner.new(self)
       total = runner.registers.map(&:membership_discount_total).reduce(:+) || 0
-      return [total, subtotal_in_cents].min
+      [total, subtotal_in_cents].min
     end
 
     def gift_card_discount_total_in_cents
-      runner = Tray::Calculator::Runner.new(self)
-      total = runner.registers.map(&:reduction_code_credit_total).reduce(:+) || 0
-      return total
+      runner.registers.map(&:reduction_code_credit_total).reduce(:+) || 0
     end
 
     def quantity_discount_total_in_cents
-      runner = Tray::Calculator::Runner.new(self)
-      total = runner.registers.map(&:quantity_discount_total).reduce(:+) || 0
-      return total
+      runner.registers.map(&:quantity_discount_total).reduce(:+) || 0
+    end
+
+    def item_fees_in_cents
+      runner.registers.map(&:item_fees_in_cents).reduce(:+).to_i || 0
+    end
+
+    def item_fees
+      item_fee_total = 0
+      item_fees = Hash.new(0)
+      runner.registers.map(&:applied_item_fees).flatten.each do |fee|
+        item_fee_total += fee[:total_in_cents].to_i
+        fee[:fees].each do |name, amount|
+          item_fees[name] += amount.to_i
+        end
+      end
+      OpenStruct.new(total_in_cents: item_fee_total, fees: item_fees)
+    end
+
+    def runner
+      @runner ||= Tray::Calculator::Runner.new(self)
     end
 
     def event_subtotal_in_cents
