@@ -12,10 +12,12 @@ module Tray
       attribute :applied_subscriptions, Array[Hash], default: []
       attribute :applied_reduction_codes, Array[Hash], default: []
       attribute :applied_quantity_discount_amount, Integer, default: 0
+      attribute :applied_item_fees, Hash, default: {}
 
       def discounted_total
         ttl_with_delivery_fee = line_items_total + delivery_fee_in_cents
-        ttl_less_credits = ttl_with_delivery_fee - customer_credits_total - promo_code_total
+        ttl_with_item_fees = ttl_with_delivery_fee + item_fees_in_cents
+        ttl_less_credits = ttl_with_item_fees - customer_credits_total - promo_code_total
         ttl_less_membership = ttl_less_credits - membership_discount_total
         ttl_less_quantity_discount = ttl_less_membership - quantity_discount_total
         ttl_less_reduction = ttl_less_quantity_discount - reduction_code_credit_total
@@ -31,6 +33,10 @@ module Tray
         end
       end
 
+      def item_fees_in_cents
+        (applied_item_fees[:total_in_cents] || 0).to_i
+       end
+
       def delivery_method
         line_items.first.options[:delivery_method]
       end
@@ -41,7 +47,7 @@ module Tray
 
       # Total customer credit available
       def customer_credits_total
-        applied_credits.map {|h| h[:amount] }.flatten.reduce(:+).to_i || 0
+        applied_credits.map {|h| h[:amount]}.flatten.reduce(:+).to_i || 0
       end
 
       # Total reduction code credit
@@ -56,12 +62,12 @@ module Tray
 
       # Total discount amount from $ based promo codes
       def promo_code_credit_total
-        applied_codes.select {|h| h[:type] == :credit}.map {|h| h[:amount] }.flatten.reduce(:+).to_i || 0
+        applied_codes.select {|h| h[:type] == :credit}.map {|h| h[:amount]}.flatten.reduce(:+).to_i || 0
       end
 
       # Total discount amount from % based promo codes (Calculated in Discounters::PromoCode)
       def promo_code_percent_total
-        applied_codes.select {|h| h[:type] == :percentage}.map {|h| h[:amount] }.flatten.reduce(:+).to_i || 0
+        applied_codes.select {|h| h[:type] == :percentage}.map {|h| h[:amount]}.flatten.reduce(:+).to_i || 0
       end
 
       # Totals membership discount amount
