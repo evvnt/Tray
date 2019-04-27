@@ -16,7 +16,7 @@ module Tray
             if register.event.present?
               next true if code.applies_to_all_events && code.organization_id == register.event.organization_id
               next true if code.event_restricted? && code.event_ids.include?(register.event.id)
-              next true if code.ticket_restricted? && register.line_items.by_ticket.any? {|item| code.ticket_type_ids.include?(item.entity.id)}
+              next true if code.ticket_restricted? && register.line_items.by_ticket.any? {|item| code.ticket_type_ids.include?(ticket_type_id(item.entity.id))}
             end
             next false
           end
@@ -54,7 +54,11 @@ module Tray
           return false unless item.product_model == :ticket
           code.applies_to_all_events ||
               (code.event_restricted? && code.event_ids.include?(item.entity.event_id)) ||
-              (code.ticket_restricted? && code.ticket_type_ids.include?(item.entity.id))
+              (code.ticket_restricted? && code.ticket_type_ids.include?(ticket_type_id(item.entity.id)))
+        end
+
+        def ticket_type_id(event_ticket_type_id)
+          EventTicketType.find(event_ticket_type_id).ticket_type_id
         end
 
         def entity_price(item)
