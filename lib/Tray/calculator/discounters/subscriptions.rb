@@ -30,24 +30,23 @@ module Tray
         def apply_discount_subscription_registers(subscription, registers)
           amount = subscription.membership.amount.to_f # * 100.0
           registers.each {|reg|
-            discount = percent_discount_in_cents_by_line_item(reg.line_items, amount)
-            reg.applied_subscriptions.push({subscription: subscription, amount: discount, description: "#{(amount * 100.0)}%", type: :percentage})
+            total_discount = 0
+            reg.line_items.each do |item|
+              ticket_price = item.entity.price_for_level_in_cents_without_fee(item.options[:price_level])
+              item.applied_discount_amounts.push({source: "Membership Discount", amount: (ticket_price * amount).to_i})
+              total_discount += (ticket_price * amount).to_i
+              # find difference between fee with and without discount, add to total_discount for register
+              old_fee = item.entity.fee_for_level_in_cents(item.options[:price_level])
+              new_fee = item.entity.fee_for_level_in_cents(item.options[:price_level], item.discount_total)
+              total_discount += old_fee - new_fee
+            end
+            reg.applied_subscriptions.push({subscription: subscription, amount: total_discount, description: "#{(amount * 100.0)}%", type: :percentage})
           }
         end
 
         def apply_fixed_subscription_registers(subscription, registers)
           amount = subscription.membership.amount.to_i
           registers.each {|reg| reg.applied_subscriptions.push({subscription: subscription, amount: amount, description: amount, type: :fixed})}
-        end
-
-        private
-        def percent_discount_in_cents_by_line_item(line_items, amount = 0.0)
-          discount = 0
-          line_items.each do |item|
-            ticket_price = item.entity.price_for_level_in_cents_without_fee(item.options[:price_level]) + item.entity.fee_for_level_in_cents(item.options[:price_level])
-            discount += ticket_price * amount
-          end
-          return discount
         end
 
       end

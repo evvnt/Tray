@@ -41,6 +41,14 @@ module Tray
         @registers.select{|reg| reg.organization_id == org_id }.map(&:ticket_fees_in_cents).reduce(0, :+)
       end
 
+      def register_for_event(event_id)
+        @registers.select{|reg| reg.event && reg.event.id == event_id}.first
+      end
+
+      def line_items
+        Tray::Models::LineItemCollection.new(@registers.map(&:line_items).flatten)
+      end
+
       def add
         Array(adders).map {|kls| kls.call(@cart)}.flatten
       end
