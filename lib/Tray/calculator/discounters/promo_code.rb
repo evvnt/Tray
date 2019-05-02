@@ -27,7 +27,7 @@ module Tray
             discount = discount_in_cents_by_line_item(reg.line_items, code)
             reg.applied_codes.push({code: code.discount_promo_code.code,
                                     amount: discount,
-                                    description: discount,
+                                    description: code.description,
                                     type: code.percentage? ? :percentage : :credit})
           end
         end
@@ -39,8 +39,9 @@ module Tray
           line_items.each do |item|
             if code_applies_to_item?(discount_code, item)
               price = entity_price(item)
-              fee = entity_fee(item)
-              discount += discount_code.calc_discount(price) + discount_code.calc_fee_discount(fee)
+              this_discount_amount = discount_code.calc_discount(price)
+              item.applied_discount_amounts.push({:source => "Promo Discount", :amount => this_discount_amount})
+              discount += discount_code.calc_discount(price)
             end
           end
           discount
@@ -63,10 +64,6 @@ module Tray
 
         def entity_price(item)
           item.entity.price_for_level_in_cents_without_fee(item.options[:price_level]) || 0 if item.product_model == :ticket
-        end
-
-        def entity_fee(item)
-          item.entity.fee_for_level_in_cents(item.options[:price_level]) || 0 if item.product_model == :ticket
         end
 
       end
