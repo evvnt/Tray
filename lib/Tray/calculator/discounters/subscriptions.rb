@@ -30,25 +30,41 @@ module Tray
         def apply_discount_subscription_registers(subscription, registers)
           amount = subscription.membership.amount.to_f # * 100.0
           registers.each {|reg|
-            total_discount = 0
+            register_discount = 0
+            # give the percent discount to each line item
             reg.line_items.each do |item|
-              ticket_price = item.entity.price_for_level_in_cents_without_fee(item.options[:price_level])
-              item.applied_discount_amounts.push({source: "Membership Discount", amount: (ticket_price * amount).to_i})
-              total_discount += (ticket_price * amount).to_i
-              # find difference between fee with and without discount, add to total_discount for register
-              old_fee = item.entity.fee_for_level_in_cents(item.options[:price_level])
-              new_fee = item.entity.fee_for_level_in_cents(item.options[:price_level], item.discount_total)
-              total_discount += old_fee - new_fee
+              discount = (item.entity.price_for_level_in_cents_without_fee(item.options[:price_level]) * amount).round(0).to_i
+              item.applied_discount_amounts.push({source: "Membership Discount", amount: discount})
+              register_discount += discount
             end
-            reg.applied_subscriptions.push({subscription: subscription, amount: total_discount, description: "#{(amount * 100.0)}%", type: :percentage})
+            # inform the register of the total discount
+            reg.applied_subscriptions.push({subscription: subscription, amount: register_discount, description: "#{(amount * 100.0)}%", type: :percentage})
           }
         end
 
         def apply_fixed_subscription_registers(subscription, registers)
           amount = subscription.membership.amount.to_i
-          registers.each {|reg| reg.applied_subscriptions.push({subscription: subscription, amount: amount, description: amount, type: :fixed})}
+          registers.each {|reg|
+            # apply the discount across the items in proportion (same way backend does it)
+            item_price_array = reg.line_items.map{|item| item.entity.price_for_level_in_cents_without_fee(item.options[:price_level])}
+            discount_array = weighted_results(amount, item_price_array)
+            reg.line_items.each_with_index do |item, index|
+              item.applied_discount_amounts.push({source: "Membership Discount", amount: discount_array[index]})
+            end
+
+            reg.applied_subscriptions.push({subscription: subscription, amount: amount, description: amount, type: :fixed})
+          }
         end
 
+        private
+        def weighted_results(total, weighted_array)
+          weighted_sum = weighted_array.sum
+          amounts = weighted_array.map do |item|
+            weighted_sum == 0 ? 0 : (total * item.to_f/weighted_sum).to_i
+          end
+          amounts[-1] += total - amounts.sum if amounts[-1]
+          amounts
+        end
       end
     end
   end

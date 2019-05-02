@@ -18,11 +18,14 @@ module Tray
         @registers = add
         fees(@registers)
         discount(@registers)
+        ticket_fees(@registers)
         total
       end
 
       def total
-        @registers.map(&:discounted_total).reduce(0, :+)
+        @registers.map(&:discounted_total).reduce(0, :+) +
+            @registers.map(&:ticket_fees_in_cents).sum +
+            @registers.map(&:delivery_fee_in_cents).sum
       end
 
       def total_for_org(org_id)
@@ -78,6 +81,10 @@ module Tray
           Discounters::ReductionCode,
           Discounters::QuantityDiscount
         ]
+      end
+
+      def ticket_fees(totals)
+        Fees::TicketFee.call(@cart, totals)
       end
 
     end

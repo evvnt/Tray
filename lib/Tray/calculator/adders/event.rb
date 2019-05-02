@@ -16,7 +16,6 @@ module Tray
           def reduce_line_items(items)
             items.reduce(0) do |memo, item|
               ticket_price = item.entity.price_for_level_in_cents_without_fee(item.options[:price_level])
-              ticket_price += item.entity.fee_for_level_in_cents(item.options[:price_level], item.discount_total)
               memo += ticket_price * (item.quantity || 1)
             end
           end
