@@ -73,7 +73,7 @@ module Tray
         elsif comp?
           "Comped"
         else
-          "#{ActionController::Base.helpers.number_to_currency(amount_in_cents.to_f/100)} off"
+          "#{ActionController::Base.helpers.number_to_currency(amount_in_cents.to_f/100)} off each"
         end
       end
 
