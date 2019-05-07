@@ -48,6 +48,10 @@ module Tray
         @registers.select{|reg| reg.event && reg.event.id == event_id}.first
       end
 
+      def registers_by_package
+        @registers.select{|reg| reg.package}
+      end
+
       def line_items
         Tray::Models::LineItemCollection.new(@registers.map(&:line_items).flatten)
       end
@@ -77,9 +81,9 @@ module Tray
         [
           Discounters::PromoCode,
           Discounters::Subscriptions,
+          Discounters::QuantityDiscount,
           Discounters::Credits,
-          Discounters::ReductionCode,
-          Discounters::QuantityDiscount
+          Discounters::ReductionCode
         ]
       end
 
