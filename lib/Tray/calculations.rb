@@ -2,10 +2,7 @@ module Tray
   module Calculations
 
     def subtotal_in_cents
-      [
-          :event_subtotal_in_cents,
-          :ticket_packages_subtotal_in_cents
-      ].concat(tag_ons_subtotal_method_array).map { |meth| method(meth).call }.sum
+      Tray::Calculator::Runner.new(self).registers.map(&:subtotal).sum + (tag_ons_subtotal_method_array).map { |meth| method(meth).call }.sum
     end
 
     def total_in_cents
