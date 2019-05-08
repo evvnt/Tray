@@ -8,9 +8,9 @@ module Tray
             registers.each do |reg|
               total_fees = 0
               reg.line_items.each do |item|
-                if item.is_a?(TicketType)
+                if item.entity.is_a?(TicketType)
                   total_fees += item.entity.fee_for_amount_in_cents(item.entity.price_for_level_in_cents_without_fee(item.options[:price_level]) - item.discount_total)
-                elsif item.is_a?(TicketPackage)
+                elsif item.entity.is_a?(TicketPackage)
                   total_fees += item.entity.package_fee_in_cents
                 end
               end
