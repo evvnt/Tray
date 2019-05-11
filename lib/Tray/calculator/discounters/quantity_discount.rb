@@ -22,7 +22,7 @@ module Tray
         end
 
         def apply_code_registers(qd, registers)
-          discount_list = qd.ticket_discount_list
+          discount_list = qd.ticket_discount_list.clone
           registers.each do |reg|
             # apply the discount across the appropriate tickets
             reg.line_items.each do |item|
@@ -40,12 +40,6 @@ module Tray
             reg.applied_quantity_discount_amount += qd.discount_amount
           end
         end
-
-
-        def discount_applies_to_ticket?(qd, ticket)
-
-        end
-
       end
     end
   end

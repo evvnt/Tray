@@ -16,7 +16,6 @@ module Tray
             elsif subscription.fixed?
               apply_fixed_subscription_registers(subscription, _applicable_registers)
             end
-
           end
         end
 
