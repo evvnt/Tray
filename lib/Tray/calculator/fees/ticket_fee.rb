@@ -12,6 +12,8 @@ module Tray
                   total_fees += item.entity.fee_for_amount_in_cents(item.entity.price_for_level_in_cents_without_fee(item.options[:price_level]) - item.discount_total)
                 elsif item.entity.is_a?(TicketPackage)
                   total_fees += item.entity.package_fee_in_cents
+                elsif item.entity.is_a?(Membership)
+                  total_fees += item.entity.fee_in_cents
                 end
               end
               reg.ticket_fees = total_fees

@@ -123,7 +123,7 @@ module Tray
 
     def membership_subtotal_in_cents
       line_items.by_membership.reduce(0) do |memo, item|
-        memo += item.entity.price_in_cents.to_i
+        memo += item.entity.price_in_cents.to_i + item.entity.fee_in_cents.to_i
       end
     end
 
