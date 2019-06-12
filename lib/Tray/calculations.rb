@@ -7,15 +7,15 @@ module Tray
 
     def total_in_cents
       [
-          :subtotal_with_discounts_in_cents
+        :subtotal_with_discounts_in_cents
       ].concat(tag_ons_subtotal_method_array).map { |meth| method(meth).call }.sum
     end
 
     def tag_ons_subtotal_method_array
       [
-          :membership_subtotal_in_cents,
-          :donation_subtotal_in_cents,
-          :gift_card_subtotal_in_cents
+        :membership_subtotal_in_cents,
+        :donation_subtotal_in_cents,
+        :gift_card_subtotal_in_cents
       ]
     end
 
@@ -142,7 +142,7 @@ module Tray
 
     def gift_card_subtotal_in_cents
       line_items.by_gift_card.reduce(0) do |memo, item|
-        memo += (item.entity.purchase_price_in_cents || 0).to_i
+        memo += ((item.entity.purchase_price_in_cents + item.entity.fee_in_cents) || 0).to_i
       end
     end
 
