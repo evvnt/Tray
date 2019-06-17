@@ -28,7 +28,7 @@ module Tray
             reg.line_items.each do |item|
               # for each ticket, look in the ticket discount list to see if there is a discount that matches
               applicable = discount_list.select do |ticket_discount|
-                ticket_discount[:ticket_type_id] == item.product_id && ticket_discount[:ticket_type_price_level_name] == item.options[:price_level]
+                ticket_discount[:ticket_type_id] == item.options[:ticket_type_id].to_i && ticket_discount[:ticket_type_price_level_name] == item.options[:price_level]
               end
               if applicable.count > 0
                 item.applied_discount_amounts << {source: "Quantity Discount", amount: applicable.first[:discount_amount]}
