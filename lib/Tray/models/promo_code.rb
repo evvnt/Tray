@@ -67,6 +67,16 @@ module Tray
         discount_promo_code.amount_in_cents
       end
 
+      def description
+        if percentage?
+          "#{percentage}% Off"
+        elsif comp?
+          "Comped"
+        else
+          "#{ActionController::Base.helpers.number_to_currency(amount_in_cents.to_f/100)} off each"
+        end
+      end
+
     end
   end
 end

@@ -13,10 +13,10 @@ module Tray
       attribute :applied_reduction_codes, Array[Hash], default: []
       attribute :applied_quantity_discount_amount, Integer, default: 0
       attribute :applied_item_fees, Hash, default: {}
+      attribute :ticket_fees, Integer, default: 0
 
       def discounted_total
-        ttl_with_delivery_fee = line_items_total + delivery_fee_in_cents
-        ttl_with_item_fees = ttl_with_delivery_fee + item_fees_in_cents
+        ttl_with_item_fees = line_items_total + item_fees_in_cents
         ttl_less_credits = ttl_with_item_fees - customer_credits_total - promo_code_total
         ttl_less_membership = ttl_less_credits - membership_discount_total
         ttl_less_quantity_discount = ttl_less_membership - quantity_discount_total
@@ -27,10 +27,15 @@ module Tray
 
       def ticket_fees_in_cents
         return package.entity.package_fee_in_cents if package.present?
-        line_items.reduce(0) do |memo, item|
-          ticket_fee = item.entity.fee_for_level_in_cents(item.options[:price_level])
-          memo += ticket_fee * (item.quantity || 1)
-        end
+        ticket_fees
+      end
+
+      def subtotal
+        discounted_total + ticket_fees_in_cents
+      end
+      
+      def final_total
+        discounted_total + ticket_fees_in_cents + delivery_fee_in_cents
       end
 
       def item_fees_in_cents

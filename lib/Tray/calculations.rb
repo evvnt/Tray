@@ -2,23 +2,20 @@ module Tray
   module Calculations
 
     def subtotal_in_cents
-      [
-          :event_subtotal_in_cents,
-          :ticket_packages_subtotal_in_cents
-      ].concat(tag_ons_subtotal_method_array).map { |meth| method(meth).call }.sum
+      Tray::Calculator::Runner.new(self).registers.map(&:subtotal).sum + (tag_ons_subtotal_method_array).map { |meth| method(meth).call }.sum
     end
 
     def total_in_cents
       [
-          :subtotal_with_discounts_in_cents
+        :subtotal_with_discounts_in_cents
       ].concat(tag_ons_subtotal_method_array).map { |meth| method(meth).call }.sum
     end
 
     def tag_ons_subtotal_method_array
       [
-          :membership_subtotal_in_cents,
-          :donation_subtotal_in_cents,
-          :gift_card_subtotal_in_cents
+        :membership_subtotal_in_cents,
+        :donation_subtotal_in_cents,
+        :gift_card_subtotal_in_cents
       ]
     end
 
@@ -46,17 +43,17 @@ module Tray
     # For creating the order - return actual ticket fees
     def ticket_fees_in_cents
       line_items.by_ticket.reduce(0) do |memo, item|
-        ticket_price = item.entity.fee_for_level_in_cents(item.options[:price_level])
-        memo += ticket_price * (item.quantity || 1)
+        fee = item.entity.fee_for_amount_in_cents(item.entity.price_for_level_in_cents(item.options[:price_level]) - item.discount_total)
+        memo += fee * (item.quantity || 1)
       end
     end
 
     # For displaying the order - return ticket fees only event is set to show them
     def customer_ticket_fees_in_cents
-      line_items.by_ticket.reduce(0) do |memo, item|
+      runner.line_items.by_ticket.reduce(0) do |memo, item|
         if item.entity.event.show_fees_to_customer?
-          ticket_price = item.entity.fee_for_level_in_cents(item.options[:price_level])
-          memo += ticket_price * (item.quantity || 1)
+          fee = item.entity.fee_for_amount_in_cents(item.entity.price_for_level_in_cents(item.options[:price_level]) - item.discount_total)
+          memo += fee * (item.quantity || 1)
         else
           memo += 0
         end
@@ -118,8 +115,8 @@ module Tray
     end
 
     def event_subtotal_in_cents
-      line_items.by_ticket.reduce(0) do |memo, item|
-        ticket_price = item.entity.price_for_level_in_cents(item.options[:price_level])
+      runner.line_items.by_ticket.reduce(0) do |memo, item|
+        ticket_price = item.entity.price_for_level_in_cents(item.options[:price_level]) - item.discount_total
         memo += ticket_price * item.quantity
       end
     end

@@ -22,11 +22,24 @@ module Tray
         end
 
         def apply_code_registers(qd, registers)
+          discount_list = qd.ticket_discount_list.clone
           registers.each do |reg|
+            # apply the discount across the appropriate tickets
+            reg.line_items.each do |item|
+              # for each ticket, look in the ticket discount list to see if there is a discount that matches
+              applicable = discount_list.select do |ticket_discount|
+                ticket_discount[:ticket_type_id] == item.options[:ticket_type_id].to_i && ticket_discount[:ticket_type_price_level_name] == item.options[:price_level]
+              end
+              if applicable.count > 0
+                item.applied_discount_amounts << {source: "Quantity Discount", amount: applicable.first[:discount_amount]}
+                discount_list.delete_at(discount_list.index(applicable.first))
+              end
+            end
+
+            # inform the register as to the total
             reg.applied_quantity_discount_amount += qd.discount_amount
           end
         end
-
       end
     end
   end

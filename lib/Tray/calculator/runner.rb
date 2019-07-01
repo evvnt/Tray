@@ -18,11 +18,14 @@ module Tray
         @registers = add
         fees(@registers)
         discount(@registers)
+        ticket_fees(@registers)
         total
       end
 
       def total
-        @registers.map(&:discounted_total).reduce(0, :+)
+        @registers.map(&:discounted_total).reduce(0, :+) +
+            @registers.map(&:ticket_fees_in_cents).sum +
+            @registers.map(&:delivery_fee_in_cents).sum
       end
 
       def total_for_org(org_id)
@@ -39,6 +42,18 @@ module Tray
 
       def ticket_fee_total_for_org(org_id)
         @registers.select{|reg| reg.organization_id == org_id }.map(&:ticket_fees_in_cents).reduce(0, :+)
+      end
+
+      def register_for_event(event_id)
+        @registers.select{|reg| reg.event && reg.event.id == event_id}.first
+      end
+
+      def registers_by_package
+        @registers.select{|reg| reg.package}
+      end
+
+      def line_items
+        Tray::Models::LineItemCollection.new(@registers.map(&:line_items).flatten)
       end
 
       def add
@@ -66,10 +81,14 @@ module Tray
         [
           Discounters::PromoCode,
           Discounters::Subscriptions,
+          Discounters::QuantityDiscount,
           Discounters::Credits,
-          Discounters::ReductionCode,
-          Discounters::QuantityDiscount
+          Discounters::ReductionCode
         ]
+      end
+
+      def ticket_fees(totals)
+        Fees::TicketFee.call(@cart, totals)
       end
 
     end

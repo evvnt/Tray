@@ -9,6 +9,7 @@ module Tray
       attribute :quantity, Integer, default: 0
       attribute :options, Hash, default: {}
       attribute :created_at, DateTime, default: -> _, attribute {Time.now}
+      attribute :applied_discount_amounts, Array[Hash], default: []
 
       def entity
         @entity ||= Cart::PRODUCT_KEYS.invert[product_model].find(product_id)
@@ -27,6 +28,14 @@ module Tray
       def valid?
         return true unless product_model == :ticket_package
         return true if options[:finished]
+      end
+
+      def discount_total
+        applied_discount_amounts.map{|amount| amount.fetch(:amount, 0)}.reduce(0,&:+)
+      end
+
+      def discount_total_in_dollars
+        discount_total / 100.0
       end
     end
   end
