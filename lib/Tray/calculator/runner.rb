@@ -16,16 +16,18 @@ module Tray
 
       def call
         @registers = add
-        fees(@registers)
         discount(@registers)
+        fees(@registers)
         ticket_fees(@registers)
+        reduction(@registers)
         total
       end
 
       def total
-        @registers.map(&:discounted_total).reduce(0, :+) +
+        @registers.map(&:discounted_total).sum +
             @registers.map(&:ticket_fees_in_cents).sum +
-            @registers.map(&:delivery_fee_in_cents).sum
+            @registers.map(&:delivery_fee_in_cents).sum -
+            @registers.map(&:reduction_code_credit_total).sum
       end
 
       def total_for_org(org_id)
@@ -77,12 +79,21 @@ module Tray
         Array(discounters).each {|kls| kls.call(@cart, totals)}
       end
 
+      def reduction(totals)
+        Array(reducers).each { |c| c.call(@cart, totals) }
+      end
+
       def discounters
         [
           Discounters::PromoCode,
           Discounters::Subscriptions,
           Discounters::QuantityDiscount,
-          Discounters::Credits,
+          Discounters::Credits
+        ]
+      end
+
+      def reducers
+        [
           Discounters::ReductionCode
         ]
       end
