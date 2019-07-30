@@ -40,7 +40,7 @@ module Tray
           card_amount = code.gift_card.current_value_in_cents
           registers.each do |reg|
             # Calculate the $ amount of gift card used after discounts have been applied
-            discount = [card_amount, reg.discounted_total].min
+            discount = [card_amount, reg.subtotal].min
             card_amount = card_amount - discount
             reg.applied_reduction_codes.push({card: code, amount: discount, type: :credit})
           end
