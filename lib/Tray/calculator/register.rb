@@ -15,14 +15,16 @@ module Tray
       attribute :applied_item_fees, Hash, default: {}
       attribute :ticket_fees, Integer, default: 0
 
+      # The discounted total is the price of the tickets less credits and
+      # discounts plus item fees.
       def discounted_total
-        ttl_with_item_fees = line_items_total + item_fees_in_cents
-        ttl_less_credits = ttl_with_item_fees - customer_credits_total - promo_code_total
-        ttl_less_membership = ttl_less_credits - membership_discount_total
-        ttl_less_quantity_discount = ttl_less_membership - quantity_discount_total
-        ttl_less_reduction = ttl_less_quantity_discount - reduction_code_credit_total
-        #Totals Can't Go Negative
-        [ttl_less_reduction, 0.0].max
+        line_items = line_items_total
+        fees = [item_fees_in_cents].sum
+        credits = [customer_credits_total, promo_code_total].sum
+        discounts = [membership_discount_total, quantity_discount_total].sum
+
+        total = line_items + fees - credits - discounts
+        [total, 0].max
       end
 
       def ticket_fees_in_cents
@@ -30,17 +32,24 @@ module Tray
         ticket_fees
       end
 
+      # The subtotal is the discounted total plus ticket fees.
       def subtotal
-        discounted_total + ticket_fees_in_cents
+        fees = [ticket_fees_in_cents].sum
+
+        discounted_total + fees
       end
       
+      # The final total is the subtotal plus delivery fees less reductions.
       def final_total
-        discounted_total + ticket_fees_in_cents + delivery_fee_in_cents
+        fees = [ticket_fees_in_cents, delivery_fee_in_cents].sum
+        reductions = [reduction_code_credit_total].sum
+
+        discounted_total + fees - reductions
       end
 
       def item_fees_in_cents
         (applied_item_fees[:total_in_cents] || 0).to_i
-       end
+      end
 
       def delivery_method
         line_items.first.options[:delivery_method]
