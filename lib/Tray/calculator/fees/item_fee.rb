@@ -6,7 +6,20 @@ module Tray
 
           def call(cart, registers)
             registers.each do |reg|
-              attribs = {totals_by_org: [{organization_id: reg.organization_id, total_in_cents: taxable_total(reg)}]}
+
+              ticket_count = 0
+              reg.line_items.each do |item|
+                entity = item.entity
+                entity = entity.ticket_type if entity.is_a?(EventTicketType)
+
+                if entity.is_a?(TicketType)
+                  ticket_count += 1
+                elsif entity.is_a?(TicketPackage)
+                  ticket_count += entity.ticket_quantity
+                end
+              end
+
+              attribs = {totals_by_org: [{organization_id: reg.organization_id, total_in_cents: taxable_total(reg), line_item_count: ticket_count}]}
               calculate_item_fees(cart, attribs, reg)
             end
           end
@@ -18,9 +31,8 @@ module Tray
           end
 
           def taxable_total(reg)
-            reg.discounted_total + reg.reduction_code_credit_total + reg.customer_credits_total - reg.ticket_fees_in_cents
+            reg.discounted_total + reg.reduction_code_credit_total + reg.customer_credits_total
           end
-
         end
       end
     end
