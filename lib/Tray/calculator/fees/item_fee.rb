@@ -15,7 +15,7 @@ module Tray
                 if entity.is_a?(TicketType)
                   ticket_count += 1
                 elsif entity.is_a?(TicketPackage)
-                  ticket_count += entity.ticket_quantity
+                  ticket_count += (entity.ticket_quantity * entity.event_quantity)
                 end
               end
 
