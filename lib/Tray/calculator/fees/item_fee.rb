@@ -20,7 +20,7 @@ module Tray
               end
 
               attribs = {totals_by_org: [{organization_id: reg.organization_id,
-                                          event_id: reg.event.id,
+                                          event_id: reg&.event&.id,
                                           total_in_cents: taxable_total(reg),
                                           line_item_count: ticket_count}]}
               calculate_item_fees(cart, attribs, reg)
